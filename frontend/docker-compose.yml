@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  csuntechfront:
+    build: ./csuntech
+    container_name: csuntechfront
+    ports:
+      - 3000:3000
+    volumes:
+    - ./csuntech:/csuntech
+    - /csuntech/node_modules
+    
+    stdin_open: true
+    tty: true
+    

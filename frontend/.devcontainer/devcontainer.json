@@ -1,0 +1,106 @@
+{
+  "name": "Frontend Dev Container",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "csuntechfront",
+  "workspaceFolder": "/csuntech",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "xabikos.JavaScriptSnippets",
+        "Zignd.html-css-class-completion",
+
+        "GitHub.copilot",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "VisualStudioExptTeam.intellicode-api-usage-examples",
+        "ms-azuretools.vscode-docker",
+        "aaron-bond.better-comments",
+        "eamodio.gitlens",
+        "christian-kohler.path-intellisense"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.formatOnType": true,
+
+        // Prettier/ESLint
+        "[javascriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": true
+          }
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "eslint.validate": ["javascript", "javascriptreact"],
+        "eslint.workingDirectories": [
+          {
+            "mode": "auto"
+          }
+        ],
+        "eslint.run": "onType",
+
+        // Path Intellisense
+        "typescript.suggest.paths": false,
+        "javascript.suggest.paths": false,
+
+        // Better Comments
+        "better-comments.multilineComments": true,
+        "better-comments.highlightPlainText": false,
+        "better-comments.tags": [
+          {
+            "tag": "!",
+            "color": "#FF2D00",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+          },
+          {
+            "tag": "?",
+            "color": "#3498DB",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+          },
+          {
+            "tag": "//",
+            "color": "#474747",
+            "strikethrough": true,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+          },
+          {
+            "tag": "todo",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+          },
+          {
+            "tag": "*",
+            "color": "#98C379",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+          }
+        ]
+      }
+    }
+  }
+}
