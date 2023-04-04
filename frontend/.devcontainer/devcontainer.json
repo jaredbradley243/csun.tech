@@ -12,6 +12,8 @@
         "xabikos.JavaScriptSnippets",
         "Zignd.html-css-class-completion",
 
+        "coenraads.disableligatures",
+        "emmanuelbeziat.vscode-great-icons",
         "GitHub.copilot",
         "VisualStudioExptTeam.vscodeintellicode",
         "VisualStudioExptTeam.intellicode-api-usage-examples",
@@ -21,6 +23,11 @@
         "christian-kohler.path-intellisense"
       ],
       "settings": {
+        "editor.fontFamily": "Fira Code",
+        "editor.fontLigatures": true,
+        "editor.fontLigatures": "'ss08'",
+        "disableLigatures.mode": "Cursor",
+        "workbench.iconTheme": "vscode-great-icons",
         "editor.formatOnSave": true,
         "editor.formatOnPaste": true,
         "editor.formatOnType": true,
