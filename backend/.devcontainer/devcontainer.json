@@ -11,7 +11,6 @@
         "ms-python.vscode-pylance",
         "ms-python.flake8",
         "ms-python.black-formatter",
-        "dongli.python-preview",
 
         "coenraads.disableligatures",
         "emmanuelbeziat.vscode-great-icons",
@@ -23,7 +22,6 @@
         "eamodio.gitlens",
         "christian-kohler.path-intellisense",
 
-        "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "xabikos.JavaScriptSnippets",
         "Zignd.html-css-class-completion"
