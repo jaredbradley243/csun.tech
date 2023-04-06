@@ -11,19 +11,16 @@
         "ms-python.vscode-pylance",
         "ms-python.flake8",
         "ms-python.black-formatter",
-        "dongli.python-preview",
 
         "coenraads.disableligatures",
         "emmanuelbeziat.vscode-great-icons",
         "GitHub.copilot",
         "VisualStudioExptTeam.vscodeintellicode",
         "VisualStudioExptTeam.intellicode-api-usage-examples",
-        "ms-azuretools.vscode-docker",
         "aaron-bond.better-comments",
         "eamodio.gitlens",
         "christian-kohler.path-intellisense",
 
-        "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "xabikos.JavaScriptSnippets",
         "Zignd.html-css-class-completion"
