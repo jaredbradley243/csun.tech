@@ -1,5 +1,5 @@
 from django.contrib.auth.models import (
-    AbstractBaseUser,
+    AbstractUser,
     BaseUserManager,
     PermissionsMixin,
 )
@@ -31,14 +31,19 @@ class CustomUserManager(BaseUserManager):
     ):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
         extra_fields["first_name"] = first_name
         extra_fields["last_name"] = last_name
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
 
-        return self.create_user(email, password, **extra_fields)
 
-
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractUser, PermissionsMixin):
     email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     is_professor = models.BooleanField(default=False)
@@ -57,6 +62,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email
+        super().save(*args, **kwargs)
 
 
 class UserProfile(models.Model):
