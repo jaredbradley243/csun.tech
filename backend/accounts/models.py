@@ -1,11 +1,13 @@
+from django.contrib.auth.models import (
+    AbstractUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-from projects.models import Project
-
-<<<<<<< Updated upstream
-# Create your models here.
-=======
-from accounts.utils import send_verification_email
+from django.core.validators import FileExtensionValidator
+from django.forms import ValidationError
 
 
 class CustomUserManager(BaseUserManager):
@@ -22,13 +24,6 @@ class CustomUserManager(BaseUserManager):
             raise ValidationError("Please use your CSUN email address")
         user.set_password(password)
         user.save()
-
-        try:
-            send_verification_email(None, user)  # calling send_verification_email
-        except Exception as e:
-            user.delete()  # delete user if email sending failed
-            raise ValidationError(str(e))
-
         return user
 
     def create_superuser(
@@ -88,4 +83,3 @@ class UserProfile(models.Model):
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
             UserProfile.objects.create(user=instance)
->>>>>>> Stashed changes
