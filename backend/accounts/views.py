@@ -25,6 +25,9 @@ def register(request):
 
     if request.method == "POST":
         form = CustomRegistrationForm(request.POST)
-        print(form.data)
+        if form.is_valid:
+            user = form.save()
+            user_email = user.email
+            print(user_email)
 
     return render(request, "accounts/register.html", {"form": form})
