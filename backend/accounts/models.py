@@ -54,6 +54,8 @@ class CustomUser(AbstractUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
+
+    # For management commands
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self):
@@ -70,7 +72,9 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="profile"
+    )
     student_id = models.CharField(max_length=10, blank=True)
     resume = models.FileField(
         upload_to="resumes/",
