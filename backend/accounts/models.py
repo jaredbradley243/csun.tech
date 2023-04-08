@@ -50,6 +50,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
     is_student = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    email_confirmed = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
