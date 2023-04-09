@@ -1,4 +1,5 @@
 from email.message import EmailMessage
+from django.forms import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
@@ -15,19 +16,44 @@ def index(request):
 def register(request):
     form = CustomRegistrationForm()
 
-    send_mail(
-        subject="Register Your Account With CSUN.tech",
-        message="Please register your account to continue.",
-        from_email="no-reply@csun.tech",
-        recipient_list=["TestUser@gmail.com"],
-        fail_silently=True,
-    )
-
     if request.method == "POST":
         form = CustomRegistrationForm(request.POST)
         if form.is_valid:
-            user = form.save()
+            user = form.save(commit=False)
+            user.is_active = False
             user_email = user.email
-            print(user_email)
+            if user_email.endswith("@csun.edu"):
+                user.is_professor = True
+            elif user_email.endswith("@my.csun.edu"):
+                user.is_student = True
+            else:
+                return HttpResponse("Please enter a CSUN email!")
+            print(
+                "user email: \n",
+                user_email,
+                "\n username: \n",
+                user.username,
+                "\n first name: \n",
+                user.first_name,
+                "\n last name: \n",
+                user.last_name,
+                "\n Is professor: \n",
+                user.is_professor,
+                "\n Is student: \n",
+                user.is_student,
+                "\n is active: \n",
+                user.is_active,
+                "\n is staff: \n",
+                user.is_staff,
+                "\n email confirmed: \n",
+                user.email_confirmed,
+            )
+            send_mail(
+                subject="Register Your Account With CSUN.tech",
+                message="Please register your account to continue.",
+                from_email="no-reply@csun.tech",
+                recipient_list=[user_email],
+                fail_silently=True,
+            )
 
     return render(request, "accounts/register.html", {"form": form})
