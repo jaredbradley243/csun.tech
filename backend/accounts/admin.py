@@ -11,6 +11,8 @@ class CustomUserAdmin(UserAdmin):
         "last_name",
         "is_staff",
         "is_active",
+        "is_student",
+        "is_professor",
     )
     list_filter = (
         "email",
