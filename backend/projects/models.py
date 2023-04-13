@@ -42,8 +42,12 @@ class ProjectProfile(models.Model):
     project_description = models.TextField()
     neccesary_skills = models.TextField()
     meeting_times = models.ManyToManyField(MeetingTime, blank=True)
-    student_list = models.ManyToManyField(
-        get_user_model(), blank=True
+    student_list = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="project_profiles",
+        null=True,
+        blank=True,
     )  # TODO: reference UserProfile.first_name & UserProfile.last_name when issue #1 is merged
 
     def __str__(self):
