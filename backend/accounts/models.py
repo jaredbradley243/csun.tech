@@ -73,10 +73,9 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(
-        CustomUser, on_delete=models.CASCADE, related_name="profile"
-    )
-    student_id = models.CharField(max_length=10, blank=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    is_volunteer = models.BooleanField(default=False)
+    student_id = models.CharField(max_length=10, blank=True, default="")
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
