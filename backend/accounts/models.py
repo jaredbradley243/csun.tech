@@ -41,12 +41,19 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
+# todo - incude a field in the registration form for first name
+# todo - incude a field in the registration form for last name
+# todo - incude a field in the registration form for student id, required only if student
+# * CustomUser is for user information related to authentication and user roles
+
+
 class CustomUser(AbstractUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     is_professor = models.BooleanField(default=False)
+    is_team_lead = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -72,10 +79,12 @@ class CustomUser(AbstractUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
 
+# * UserProfile is for user information not related to authentication or user roles
+# todo - move student_id to the custom user class above
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     is_volunteer = models.BooleanField(default=False)
-    student_id = models.CharField(max_length=10, blank=True, default="")
+    student_id = models.CharField(unique=True, max_length=10, blank=True, default="")
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
