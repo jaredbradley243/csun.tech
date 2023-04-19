@@ -45,8 +45,6 @@ class CustomUserManager(BaseUserManager):
 # todo - incude a field in the registration form for last name
 # todo - incude a field in the registration form for student id, required only if student
 # * CustomUser is for user information related to authentication and user roles
-
-
 class CustomUser(AbstractUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=150, unique=True, default="")
