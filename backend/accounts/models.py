@@ -9,6 +9,12 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.forms import ValidationError
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+# Create your models here.
+=======
+>>>>>>> Stashed changes
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -41,19 +47,41 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
+<<<<<<< Updated upstream
+=======
+# todo - incude a field in the registration form for first name
+# todo - incude a field in the registration form for last name
+# todo - incude a field in the registration form for student id, required only if student
+# * CustomUser is for user information related to authentication and user roles
+
+
+>>>>>>> Stashed changes
 class CustomUser(AbstractUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     is_professor = models.BooleanField(default=False)
+<<<<<<< Updated upstream
     is_student = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+=======
+    is_team_lead = models.BooleanField(default=False)
+    is_student = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    email_confirmed = models.BooleanField(default=False)
+>>>>>>> Stashed changes
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
+<<<<<<< Updated upstream
+=======
+
+    # For management commands
+>>>>>>> Stashed changes
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self):
@@ -69,9 +97,18 @@ class CustomUser(AbstractUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
 
+<<<<<<< Updated upstream
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     student_id = models.CharField(max_length=10, blank=True)
+=======
+# * UserProfile is for user information not related to authentication or user roles
+# todo - move student_id to the custom user class above
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    is_volunteer = models.BooleanField(default=False)
+    student_id = models.CharField(unique=True, max_length=10, blank=True, default="")
+>>>>>>> Stashed changes
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
@@ -83,3 +120,7 @@ class UserProfile(models.Model):
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
             UserProfile.objects.create(user=instance)
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
