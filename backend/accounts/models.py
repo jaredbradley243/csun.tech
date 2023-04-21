@@ -6,7 +6,11 @@ from django.contrib.auth.models import (
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models
-from django.core.validators import FileExtensionValidator
+from django.core.validators import (
+    FileExtensionValidator,
+    MinLengthValidator,
+    MaxLengthValidator,
+)
 from django.forms import ValidationError
 
 
@@ -22,6 +26,11 @@ class CustomUserManager(BaseUserManager):
             user.is_student = True
         else:
             raise ValidationError("Please use your CSUN email address")
+        if user.is_student:
+            if not user.student_id:
+                raise ValidationError("Please enter your student ID")
+        if len(user.student_id) != 9:
+            raise ValidationError("Please enter a valid student ID")
         user.set_password(password)
         user.save()
         return user
@@ -41,27 +50,31 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
-# todo - incude a field in the registration form for first name
-# todo - incude a field in the registration form for last name
-# todo - incude a field in the registration form for student id, required only if student
 # * CustomUser is for user information related to authentication and user roles
 class CustomUser(AbstractUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, blank=False)
     username = models.CharField(max_length=150, unique=True, default="")
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    is_professor = models.BooleanField(default=False)
-    is_team_lead = models.BooleanField(default=False)
-    is_student = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    email_confirmed = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=30, blank=False, verbose_name="first name")
+    last_name = models.CharField(max_length=30, blank=False, verbose_name="last name")
+    student_id = models.CharField(
+        unique=True,
+        max_length=9,
+        blank=False,
+        validators=[MinLengthValidator(9), MaxLengthValidator(9)],
+        verbose_name="Student ID",
+    )
+    is_staff = models.BooleanField(default=False, verbose_name="staff")
+    is_professor = models.BooleanField(default=False, verbose_name="professor")
+    is_team_lead = models.BooleanField(default=False, verbose_name="team lead")
+    is_student = models.BooleanField(default=False, verbose_name="student")
+    email_confirmed = models.BooleanField(default=False, verbose_name="email confirmed")
+    is_active = models.BooleanField(default=True, verbose_name="active")
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
 
-    # For management commands
+    # For createsuperuser commands
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self):
@@ -78,11 +91,9 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
 
 # * UserProfile is for user information not related to authentication or user roles
-# todo - move student_id to the custom user class above
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     is_volunteer = models.BooleanField(default=False)
-    student_id = models.CharField(unique=True, max_length=10, blank=True, default="")
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
