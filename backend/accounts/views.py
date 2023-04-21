@@ -18,7 +18,7 @@ def register(request):
 
     if request.method == "POST":
         form = CustomRegistrationForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
             user_email = user.email
@@ -28,6 +28,11 @@ def register(request):
                 user.is_student = True
             else:
                 return HttpResponse("Please enter a CSUN email!")
+            if user.is_student:
+                if not user.student_id:
+                    return HttpResponse("Please enter your student ID")
+            if len(user.student_id) != 9:
+                return HttpResponse("Please enter a valid student ID")
             print(
                 "user email: \n",
                 user_email,
@@ -37,6 +42,8 @@ def register(request):
                 user.first_name,
                 "\n last name: \n",
                 user.last_name,
+                "\n student id: \n",
+                user.student_id,
                 "\n Is professor: \n",
                 user.is_professor,
                 "\n Is student: \n",
