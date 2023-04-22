@@ -17,7 +17,7 @@ class CustomRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super(CustomRegistrationForm, self).__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs.update({"placeholder": "Email"})
+        self.fields["email"].widget.attrs.update({"placeholder": "CSUN Email"})
         self.fields["first_name"].widget.attrs.update({"placeholder": "First Name"})
         self.fields["last_name"].widget.attrs.update({"placeholder": "Last Name"})
         self.fields["student_id"].widget.attrs.update({"placeholder": "Student ID"})
