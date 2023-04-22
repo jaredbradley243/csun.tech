@@ -15,6 +15,11 @@ from django.forms import ValidationError
 
 
 class CustomUserManager(BaseUserManager):
+    """
+    Custom user manager to handle user creation and superuser creation with
+    custom fields and validations.
+    """
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValidationError("Please enter an email")
@@ -26,11 +31,6 @@ class CustomUserManager(BaseUserManager):
             user.is_student = True
         else:
             raise ValidationError("Please use your CSUN email address")
-        if user.is_student:
-            if not user.student_id:
-                raise ValidationError("Please enter your student ID")
-        if len(user.student_id) != 9:
-            raise ValidationError("Please enter a valid student ID")
         user.set_password(password)
         user.save()
         return user
@@ -50,8 +50,13 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
-# * CustomUser is for user information related to authentication and user roles
 class CustomUser(AbstractUser, PermissionsMixin):
+    """
+    CustomUser model extends AbstractUser and PermissionsMixin to include
+    additional fields and customizations
+    for user authentication and roles.
+    """
+
     email = models.EmailField(unique=True, blank=False)
     username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=False, verbose_name="first name")
@@ -90,10 +95,14 @@ class CustomUser(AbstractUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
 
-# * UserProfile is for user information not related to authentication or user roles
 class UserProfile(models.Model):
+    """
+    UserProfile model stores additional user information not related to
+    authentication or user roles.
+    """
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    is_volunteer = models.BooleanField(default=False)
+    is_volunteer = models.BooleanField(default=False, verbose_name="volunteer")
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
@@ -101,6 +110,7 @@ class UserProfile(models.Model):
         blank=True,
     )
 
+    # This signal receiver creates a UserProfile instance when a new CustomUser is created.
     @receiver(post_save, sender=CustomUser)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
