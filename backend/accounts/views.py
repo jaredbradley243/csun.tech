@@ -36,28 +36,7 @@ def register(request):
                     return HttpResponse("Please enter your student ID")
             if len(user.student_id) != 9:
                 return HttpResponse("Please enter a valid student ID")
-            print(
-                "user email: \n",
-                user_email,
-                "\n username: \n",
-                user.username,
-                "\n first name: \n",
-                user.first_name,
-                "\n last name: \n",
-                user.last_name,
-                "\n student id: \n",
-                user.student_id,
-                "\n Is professor: \n",
-                user.is_professor,
-                "\n Is student: \n",
-                user.is_student,
-                "\n is active: \n",
-                user.is_active,
-                "\n is staff: \n",
-                user.is_staff,
-                "\n email confirmed: \n",
-                user.email_confirmed,
-            )
+
             send_mail(
                 subject="Register Your Account With CSUN.tech",
                 message="Please register your account to continue.",
