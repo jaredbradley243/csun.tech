@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "accounts",
+    "projects",
 ]
 
 MIDDLEWARE = [
@@ -102,6 +104,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Custom user model settings
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+# Media files
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
