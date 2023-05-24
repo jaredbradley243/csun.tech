@@ -1,0 +1,18 @@
+:root {
+  --homepage-text-color: #000;
+  --homepage-background-color: #ffffff;
+}
+
+.darkMode {
+  --homepage-text-color: #fff;
+  --homepage-background-color: #42454a;
+}
+
+.designTable_container {
+  padding: 2rem 10vw;
+}
+
+.homePage_container {
+  color: var(--homepage-text-color);
+  background-color: var(--homepage-background-color);
+}

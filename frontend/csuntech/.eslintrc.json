@@ -17,7 +17,18 @@
     "sourceType": "module"
   },
   "plugins": ["react", "prettier"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "prop-types": {
+      "ignore": [],
+      "customValidators": [],
+      "skipUndeclared": false
+    }
+  },
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "react/prop-types": "error"
   }
 }

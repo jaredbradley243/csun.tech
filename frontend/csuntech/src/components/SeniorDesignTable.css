@@ -1,0 +1,37 @@
+.designTable {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.designTable_cell.designTable_Header {
+  background-color: #1e2124 !important;
+  color: #fff;
+}
+
+.designTable_cell {
+  padding: 20px;
+  color: #808080;
+  background-color: #ffffff;
+  cursor: default;
+}
+
+.designTable_cell:nth-child(8n + 1),
+.designTable_cell:nth-child(8n + 2),
+.designTable_cell:nth-child(8n + 3),
+.designTable_cell:nth-child(8n + 4) {
+  background-color: #f5f5f5;
+}
+
+.designTable_btn {
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.designTable_btn:hover {
+  text-decoration: underline;
+}
