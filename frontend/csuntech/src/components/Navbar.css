@@ -1,24 +1,24 @@
 .navbar {
-    font-family: Roboto;
-    height: 60px;
-    padding: 0.5rem calc((100vw - 1200px)/2);
-    margin: 0;
+  font-family: Roboto;
+  height: 60px;
+  padding: 0.5rem calc((100vw - 1200px) / 2);
+  margin: 0;
 
-    display: flex;
-    gap: 1.7rem;
-    justify-content: right;
-    align-items: center;
+  display: flex;
+  gap: 1.7rem;
+  justify-content: right;
+  align-items: center;
 }
 
 .navbar_icon {
-    color: white;
-    font-size: 1rem;
-    width: 28.5px;
-    background-color: inherit;
-    padding: .3rem;
+  color: white;
+  font-size: 1rem;
+  width: 28.5px;
+  background-color: inherit;
+  padding: 0.3rem;
 }
 
 .navbar_btn {
-    border: none;
-    cursor: pointer;
+  border: none;
+  cursor: pointer;
 }

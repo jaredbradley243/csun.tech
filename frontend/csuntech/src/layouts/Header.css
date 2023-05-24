@@ -1,16 +1,16 @@
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1e2124;
-    padding: 0 10%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e2124;
+  padding: 0 10%;
 }
 
 .header_logoContainer {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .header_lunaLogo {
-    height: 50px;
+  height: 50px;
 }
