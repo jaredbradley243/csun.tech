@@ -8,8 +8,6 @@ import HomePage from "./pages/HomePage";
 import Header from "./layouts/Header";
 
 function App() {
-  //  Pass down the isDarkMode variable to the components
-  //  that needs to access it
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem("isDarkMode") === "true"
   );
@@ -20,12 +18,12 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className={isDarkMode ? "App darkMode" : "App"}>
       <Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
       <Routes>
-        <Route exact path="/" element={<HomePage isDarkMode={isDarkMode} />} />
-        <Route path="/login" element={<Login isDarkMode={isDarkMode} />} />
-        <Route path="/signup" element={<Signup isDarkMode={isDarkMode} />} />
+        <Route exact path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </div>
