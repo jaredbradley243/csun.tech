@@ -1,7 +1,6 @@
 from django.contrib.auth.models import (
     AbstractUser,
     BaseUserManager,
-    PermissionsMixin,
 )
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -12,6 +11,12 @@ from django.core.validators import (
     MaxLengthValidator,
 )
 from django.forms import ValidationError
+from csuntech.settings import AUTH_USER_MODEL
+
+
+def validate_integer(value):
+    if not value.isdigit():
+        raise ValidationError("Only integer values are allowed.")
 
 
 class CustomUserManager(BaseUserManager):
@@ -22,15 +27,15 @@ class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValidationError("Please enter an email")
+            raise ValidationError("An Email Address Is Required")
+
         email = self.normalize_email(email)
+
+        if not email.endswith(("@csun.edu", "@my.csun.edu")):
+            raise ValidationError("Please Enter A CSUN email address")
+
         user = self.model(email=email, **extra_fields)
-        if email.endswith("@csun.edu"):
-            user.is_professor = True
-        elif email.endswith("@my.csun.edu"):
-            user.is_student = True
-        else:
-            raise ValidationError("Please use your CSUN email address")
+
         user.set_password(password)
         user.save()
         return user
@@ -50,7 +55,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
 
-class CustomUser(AbstractUser, PermissionsMixin):
+class CustomUser(AbstractUser):
     """
     CustomUser model extends AbstractUser and PermissionsMixin to include
     additional fields and customizations
@@ -61,17 +66,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=False, verbose_name="first name")
     last_name = models.CharField(max_length=30, blank=False, verbose_name="last name")
-    student_id = models.CharField(
-        unique=True,
-        max_length=9,
-        blank=False,
-        validators=[MinLengthValidator(9), MaxLengthValidator(9)],
-        verbose_name="Student ID",
-    )
     is_staff = models.BooleanField(default=False, verbose_name="staff")
-    is_professor = models.BooleanField(default=False, verbose_name="professor")
-    is_team_lead = models.BooleanField(default=False, verbose_name="team lead")
-    is_student = models.BooleanField(default=False, verbose_name="student")
     email_confirmed = models.BooleanField(default=False, verbose_name="email confirmed")
     is_active = models.BooleanField(default=True, verbose_name="active")
 
@@ -101,8 +96,47 @@ class UserProfile(models.Model):
     authentication or user roles.
     """
 
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+    )
+    bio = models.TextField(null=True, blank=True)
+    # Todo: Implement Photo
+
+    @property
+    def is_student(self):
+        return self.user.email.endswith("@my.csun.edu")
+
+    @property
+    def is_team_lead(self):
+        return self.is_student and self.team_lead
+
+    @property
+    def is_professor(self):
+        return self.user.email.endswith("@csun.edu")
+
+    @property
+    def get_role(self):
+        if self.is_professor:
+            return "professor"
+        elif self.is_team_lead:
+            return "team lead"
+        elif self.is_student:
+            return "student"
+        else:
+            return "unknown"
+
+
+class StudentProfile(UserProfile):
+    team_lead = models.BooleanField(default=False, blank=True)
     is_volunteer = models.BooleanField(default=False, verbose_name="volunteer")
+    student_id = models.CharField(
+        unique=True,
+        max_length=9,
+        blank=False,
+        validators=[MinLengthValidator(9), MaxLengthValidator(9), validate_integer],
+        verbose_name="Student ID",
+        null=False,
+    )
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
@@ -110,8 +144,30 @@ class UserProfile(models.Model):
         blank=True,
     )
 
-    # This signal receiver creates a UserProfile instance when a new CustomUser is created.
-    @receiver(post_save, sender=CustomUser)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            UserProfile.objects.create(user=instance)
+    project = models.ForeignKey(
+        "projects.Project",
+        related_name="students",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+
+
+class ProfessorProfile(UserProfile):
+    rate_my_professor_link = models.URLField(blank=True, null=True)
+    csun_faculty_page_link = models.URLField(blank=True, null=True)
+    projects = models.ManyToManyField(
+        "projects.Project",
+        related_name="professors",
+        blank=True,
+    )
+
+
+# This signal receiver creates a UserProfile instance when a new CustomUser is created.
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        if instance.email.endswith("@csun.edu"):
+            ProfessorProfile.objects.create(user=instance)
+        elif instance.email.endswith("@my.csun.edu"):
+            StudentProfile.objects.create(user=instance)
