@@ -23,6 +23,7 @@
         "christian-kohler.path-intellisense"
       ],
       "settings": {
+        "files.eol": "\n",
         "editor.fontFamily": "Fira Code",
         "editor.fontLigatures": true,
         "editor.fontLigatures": "'ss08'",

@@ -26,6 +26,7 @@
         "Zignd.html-css-class-completion"
       ],
       "settings": {
+        "files.eol": "\n",
         "python.analysis.extraPaths": ["./"],
         "editor.fontFamily": "Fira Code",
         "editor.fontLigatures": true,
