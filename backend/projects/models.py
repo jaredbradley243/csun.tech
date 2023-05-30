@@ -4,6 +4,7 @@ from django.core.validators import MaxValueValidator
 
 class Project(models.Model):
     project_name = models.CharField(null=False, max_length=100, unique=True)
+    project_description = models.CharField(null=True, blank=True, max_length=500)
     open_slots = models.IntegerField(
         null=True, blank=True, validators=[MaxValueValidator(2)]
     )
