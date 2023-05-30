@@ -15,7 +15,7 @@
 
   display: grid;
   place-items: center;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .designTable_redAlert {
@@ -44,5 +44,3 @@
 .designTable_btn:hover {
   text-decoration: underline;
 }
-
-

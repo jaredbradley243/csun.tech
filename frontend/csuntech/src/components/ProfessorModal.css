@@ -1,71 +1,71 @@
 .professorModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
 
-    color: #1e2124;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: grid;
-    place-items: center;
+  color: #1e2124;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
 }
 
 .professorModal_content {
-    position: relative;
+  position: relative;
 
-    background-color: #fefefe;
-    border: 1px solid #888;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    padding: 20px 40px;
+  background-color: #fefefe;
+  border: 1px solid #888;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 20px 40px;
 
-    max-width: 400px;
-    max-height: 90%;
+  max-width: 400px;
+  max-height: 90%;
 
-    overflow: auto;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
 @media only screen and (max-width: 440px) {
-    .professorModal-content {
-        max-width: 90%;
-    }
+  .professorModal-content {
+    max-width: 90%;
+  }
 }
 
 .close {
-    position: absolute;
-    right: 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
+  position: absolute;
+  right: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
 }
 
 .professorModal h2 {
-    text-align: center;
-    font-size: 24px;
-    margin: 0 0 16px;
+  text-align: center;
+  font-size: 24px;
+  margin: 0 0 16px;
 }
 
 .professorModal p {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 strong {
-    font-weight: bold;
+  font-weight: bold;
 }
 
-.professorModal_linkContainer > a{
-    display: block;
+.professorModal_linkContainer > a {
+  display: block;
 }
 
 .professorModal_content::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .professorModal_content {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
