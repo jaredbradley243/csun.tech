@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d1b480a5.css",
+    "main.js": "/static/js/main.79dddf64.js",
+    "static/media/luna-logo.png": "/static/media/luna-logo.5772c4b13ddbeed52328.png",
+    "index.html": "/index.html",
+    "main.d1b480a5.css.map": "/static/css/main.d1b480a5.css.map",
+    "main.79dddf64.js.map": "/static/js/main.79dddf64.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d1b480a5.css",
+    "static/js/main.79dddf64.js"
+  ]
+}
