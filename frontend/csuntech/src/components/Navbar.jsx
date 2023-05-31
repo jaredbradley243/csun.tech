@@ -1,6 +1,6 @@
-/* eslint-disable react/button-has-type */
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import "./Navbar.css";
 
@@ -14,16 +14,25 @@ export default function Navbar(props) {
     if (isLoggedIn)
       return (
         <li>
-          <button className="navbar_btn navbar_icon" aria-label="Log Out">
+          <button
+            type="button"
+            className="navbar_btn navbar_icon"
+            aria-label="Log Out"
+          >
             <i className="fa-solid fa-right-from-bracket" />
           </button>
         </li>
       );
     return (
       <li>
-        <button className="navbar_btn navbar_icon" aria-label="Log In">
+        <Link
+          to="/login"
+          type="button"
+          className="navbar_btn navbar_icon"
+          aria-label="Log In"
+        >
           <i className="fa-solid fa-right-to-bracket" />
-        </button>
+        </Link>
       </li>
     );
   }
@@ -50,6 +59,7 @@ export default function Navbar(props) {
         {/* Light/Dark Mode button */}
         <li>
           <button
+            type="button"
             className="navbar_btn navbar_icon"
             onClick={toggleDarkMode}
             aria-label={
