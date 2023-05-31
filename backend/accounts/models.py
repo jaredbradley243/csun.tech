@@ -152,8 +152,23 @@ class StudentProfile(UserProfile):
         on_delete=models.CASCADE,
     )
 
+    def join_project(self, project):
+
+    def leave_project(self, project):
+    
+
+class TeamLeadProfile(StudentProfile):
+    class Meta:
+        proxy = True
+    
+    def add_student_to_project(self, student):
+
+    def remove_student_from_project(self, student):
+
+    
 
 class ProfessorProfile(UserProfile):
+
     rate_my_professor_link = models.URLField(blank=True, null=True)
     csun_faculty_page_link = models.URLField(blank=True, null=True)
     projects = models.ManyToManyField(
@@ -161,6 +176,16 @@ class ProfessorProfile(UserProfile):
         related_name="professors",
         blank=True,
     )
+
+    def create_project(self, project_name, project_description, open_slots, capacity, relevant_skills, meeting_schedule):
+
+    def edit_project(self, project, **kwargs):
+
+    def delete_project(self, project):
+
+    def add_student_to_project(self, student):
+
+    def remove_student_from_project(self, student):
 
 
 # This signal receiver creates a UserProfile instance when a new CustomUser is created.
