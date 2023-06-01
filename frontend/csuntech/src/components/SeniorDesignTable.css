@@ -87,7 +87,7 @@
 
 .designTable_joinBtn {
   width: fit-content;
-  padding: .5rem;
+  padding: .5rem 1rem;
   margin: .5rem 0 1rem;
   border-radius: 5px;
   color: var(--designtable-join-btn-color);
