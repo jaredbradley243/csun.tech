@@ -1,7 +1,8 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/no-array-index-key */
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import "./ProjectModal.css";
 
@@ -9,13 +10,27 @@ export default function ProjectModal(props) {
   const { project, closeProjectModal } = props;
 
   function closeModalWithEsc(e) {
-    if (e.key === "Escape") {
-      closeProjectModal();
-    }
+    if (e.key === "Escape") closeProjectModal();
+  }
+
+  useEffect(() => {
+    document.addEventListener("keyup", closeModalWithEsc);
+    return () => {
+      document.removeEventListener("keyup", closeModalWithEsc);
+    };
+  }, []);
+
+  function closeModalWithClickOutside(e) {
+    if (e.target.id === "projectModal") closeProjectModal();
   }
 
   return (
-    <div className="projectModal" onKeyUp={closeModalWithEsc} tabIndex={0}>
+    <div
+      id="projectModal"
+      className="projectModal"
+      onClick={closeModalWithClickOutside}
+      tabIndex={0}
+    >
       <div className="projectModal_content">
         <button type="button" className="close" onClick={closeProjectModal}>
           X

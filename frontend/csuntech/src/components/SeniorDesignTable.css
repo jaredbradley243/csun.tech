@@ -1,40 +1,80 @@
+:root {
+  --designtable-header-bg-color: #1e2124;
+  --designtable-header-text-color: #fff;
+  --designtable-join-btn-color: #fff;
+  --designtable-join-btn-bg-color: #1e2124;
+  /* Mobile Version */
+  --designtable-cell-bg-color: #f5f5f5; 
+  --designtable-cell-text-color: #808080;
+  /* Desktop Version */
+  --desktop-designtable-cell-bg-color: #fff;
+  --desktop-designtable-cell-highlight: #f5f5f5;
+}
+
+.darkMode {
+  /* Change the above color variables for darkmode here */
+}
+
 .designTable {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-radius: 10px;
+  width: 90%;
+  overflow: hidden;
   text-align: center;
   width: 80%;
   overflow: hidden;
 }
 
+.designTable_gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 .designTable_cell {
-  color: #808080;
-  min-height: 60px;
-  background-color: #ffffff;
+  color: var(--designtable-cell-text-color);
+  background-color: var(--designtable-cell-bg-color);
   cursor: default;
 
-  display: grid;
-  place-items: center;
   padding: 0.5rem 1rem;
+  width: 100%;
+  text-align: left;
+
+  min-height: 60px;
+  display: grid;
+  align-items: center;
+}
+
+.designTable_header {
+  color: var(--designtable-header-text-color);
 }
 
 .designTable_redAlert {
   color: red;
 }
 
-.designTable_cell:nth-child(8n + 1),
-.designTable_cell:nth-child(8n + 2),
-.designTable_cell:nth-child(8n + 3),
-.designTable_cell:nth-child(8n + 4) {
-  background-color: #f5f5f5;
+.designTable_firstColumn .designTable_header {
+  border-top-left-radius: 5px;
 }
 
-.designTable_cell.designTable_Header {
-  background-color: #1e2124;
-  color: #fff;
+.designTable_secondColumn .designTable_header {
+  border-top-right-radius: 5px;
 }
 
-.designTable_btn {
+.designTable_firstColumn .designTable_cell:nth-child(4n) {
+  border-bottom-left-radius: 5px;
+}
+
+.designTable_secondColumn .designTable_cell:nth-child(4n) {
+  border-bottom-right-radius: 5px;
+}
+
+.designTable_cell:focus-visible {
+  outline: none;
+}
+
+.designTable_redAlert {
+  color: red;
+}
+
+.designTable_btn, .designTable_joinBtn {
   border: none;
   font-size: inherit;
   font-family: inherit;
@@ -44,3 +84,53 @@
 .designTable_btn:hover {
   text-decoration: underline;
 }
+
+.designTable_joinBtn {
+  width: fit-content;
+  padding: .5rem;
+  margin: .5rem 0 1rem;
+  border-radius: 5px;
+  color: var(--designtable-join-btn-color);
+  background-color: var(--designtable-join-btn-bg-color);
+}
+
+@media screen and (min-width: 400px) {
+  .designTable {
+    width: 80%;
+  }
+}
+
+/* CSS for desktop version */
+@media screen and (min-width: 700px) {
+  .designTable {
+    display: grid;
+    grid-template-columns: 1fr repeat(4, 1fr);
+    border-radius: 10px;
+  }
+
+  .designTable_cell {
+    text-align: center;
+    padding: .5rem;
+    background-color: var(--desktop-designtable-cell-bg-color);
+  }
+
+  .designTable_cell:nth-child(10n - 9),
+  .designTable_cell:nth-child(10n - 8),
+  .designTable_cell:nth-child(10n - 7),
+  .designTable_cell:nth-child(10n - 6),
+  .designTable_cell:nth-child(10n - 5) {
+    background-color: var(--desktop-designtable-cell-highlight);
+  }
+
+  .designTable_joinBtn {
+    margin: 0 auto;
+  }
+
+  .designTable_cell.designTable_header {
+    background-color: var(--designtable-header-bg-color);
+    color: var(--designtable-header-text-color);
+  }
+}
+
+
+
