@@ -1,16 +1,18 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "boxicons/css/boxicons.min.css";
 import "./Login.css";
 import lunaLogo from "../images/luna-logo-alt.png";
-import githubLogo from "../images/github-logo.jpg";
+import microsoftLogo from "../images/microsoft-logo.jpg";
 import googleLogo from "../images/google-logo.jpg";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
+  const [isUsernameValid, setIsUsernameValid] = useState(true);
   const [showUsernameTitle, setShowUsernameTitle] = useState(false);
   const [showPasswordTitle, setShowPasswordTitle] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +22,24 @@ export default function Login() {
     if (e.target.value.length > 0) setShowUsernameTitle(true);
     else setShowUsernameTitle(false);
   }
+
+  function validatePassword() {
+    if (password.length < 3) setIsPasswordValid(false);
+    else setIsPasswordValid(true);
+  }
+
+  function validateUsername() {
+    if (!username.endsWith("csun.edu")) setIsUsernameValid(false);
+    else setIsUsernameValid(true);
+  }
+
+  useEffect(() => {
+    if (!isPasswordValid) validatePassword();
+  }, [password]);
+
+  useEffect(() => {
+    if (!isUsernameValid) validateUsername();
+  }, [username]);
 
   function handlePassword(e) {
     setPassword(e.target.value);
@@ -51,12 +71,23 @@ export default function Login() {
         >
           Username
         </span>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={handleUsername}
-        />
+        <div>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={handleUsername}
+            onBlur={validateUsername}
+          />
+        </div>
+        <span
+          className={
+            isUsernameValid ? "login_invalidField" : "login_invalidField show"
+          }
+        >
+          Username must end with csun.edu
+          <i className="bx bx-error-circle login_err" />
+        </span>
         <span
           className={
             showPasswordTitle
@@ -75,6 +106,7 @@ export default function Login() {
             placeholder="Password"
             value={password}
             onChange={handlePassword}
+            onBlur={validatePassword}
           />
           <button
             type="button"
@@ -83,6 +115,14 @@ export default function Login() {
           >
             <i className={showPassword ? "bx bx-hide" : "bx bx-show"} />
           </button>
+          <span
+            className={
+              isPasswordValid ? "login_invalidField" : "login_invalidField show"
+            }
+          >
+            Password must be at least 3 characters
+            <i className="bx bx-error-circle login_err" />
+          </span>
         </div>
 
         <input type="submit" value="Log In" />
@@ -100,14 +140,14 @@ export default function Login() {
         <div className="login_socialButtonContainer">
           <button type="button" className="login_socialButton">
             <div>
-              <img src={githubLogo} alt="" />
-              Github
+              <img src={googleLogo} alt="" />
+              Google
             </div>
           </button>
           <button type="button" className="login_socialButton">
             <div>
-              <img src={googleLogo} alt="" />
-              Google
+              <img src={microsoftLogo} alt="" />
+              Microsoft
             </div>
           </button>
         </div>
