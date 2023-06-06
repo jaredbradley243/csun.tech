@@ -61,7 +61,7 @@ export default function SeniorDesignTable(props) {
             </button>
             <div
               className={
-                project.openSpots < 5
+                project.openSpots <= 5
                   ? "designTable_cell designTable_redAlert"
                   : "designTable_cell"
               }
