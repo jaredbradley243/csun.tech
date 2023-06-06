@@ -1,8 +1,8 @@
 :root {
-  --designtable-header-bg-color: #1e2124;
+  --designtable-header-bg-color: #D22030;
   --designtable-header-text-color: #fff;
   --designtable-join-btn-color: #fff;
-  --designtable-join-btn-bg-color: #1e2124;
+  --designtable-join-btn-bg-color: #55565A;
   /* Mobile Version */
   --designtable-cell-bg-color: #f5f5f5; 
   --designtable-cell-text-color: #808080;
