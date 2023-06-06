@@ -81,6 +81,10 @@
   cursor: pointer;
 }
 
+.designTable_btn{
+  text-decoration: underline;
+}
+
 .designTable_btn:hover {
   text-decoration: underline;
 }
@@ -121,6 +125,10 @@
   .designTable_cell:nth-child(10n - 5) {
     background-color: var(--desktop-designtable-cell-highlight);
   }
+
+  .designTable_btn{
+  text-decoration: none;
+}
 
   .designTable_joinBtn {
     margin: 0 auto;
