@@ -24,7 +24,7 @@ export default function Login() {
   }
 
   function validatePassword() {
-    if (password.length < 3) setIsPasswordValid(false);
+    if (password.length < 8) setIsPasswordValid(false);
     else setIsPasswordValid(true);
   }
 
@@ -69,12 +69,12 @@ export default function Login() {
               : "login_usernameTitle"
           }
         >
-          Username
+          Email
         </span>
         <div>
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Email"
             value={username}
             onChange={handleUsername}
             onBlur={validateUsername}
@@ -85,7 +85,7 @@ export default function Login() {
             isUsernameValid ? "login_invalidField" : "login_invalidField show"
           }
         >
-          Username must end with csun.edu
+          Please use your CSUN email address
           <i className="bx bx-error-circle login_err" />
         </span>
         <span
@@ -120,7 +120,7 @@ export default function Login() {
               isPasswordValid ? "login_invalidField" : "login_invalidField show"
             }
           >
-            Password must be at least 3 characters
+            Password must be at least 8 characters
             <i className="bx bx-error-circle login_err" />
           </span>
         </div>
