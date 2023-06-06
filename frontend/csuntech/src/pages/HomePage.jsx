@@ -27,7 +27,7 @@ export default function HomePage() {
       _id: 2,
       name: "Project2",
       professor: "professor2",
-      openSpots: 4,
+      openSpots: 5,
       totalSpots: 30,
       description:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
