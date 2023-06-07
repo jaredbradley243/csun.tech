@@ -153,25 +153,16 @@ class StudentProfile(UserProfile):
         on_delete=models.CASCADE,
     )
 
+    # TODO: Join_project and leave_project need to be refactored into project model
     def join_project(self, project):
-        if not self.is_student:
-            raise PermissionDenied("Only students can join projects")
         if self.project:
-            raise PermissionDenied("Student is already enrolled in a project")
-        if project.open_slots <= 0:
-            raise PermissionDenied("No available slots in the project")
-        self.project = project
-        self.save()
-        project.open_slots -= 1
-        project.save()
+            raise ValidationError("You're already enrolled in a project")
+        project.add_student(self)
 
     def leave_project(self):
         if not self.project:
-            raise PermissionDenied("Student is not enrolled in a project")
-        self.project.open_slots += 1
-        self.project.save()
-        self.project = None
-        self.save()
+            raise ValidationError("You're not enrolled in a project")
+        self.project.remove_student(self)
     
 
 class TeamLeadProfile(StudentProfile):
@@ -179,10 +170,14 @@ class TeamLeadProfile(StudentProfile):
         proxy = True
     
     def add_student_to_project(self, student):
-
+        if not self.project:
+            raise ValidationError("User is not enrolled in a project")
+        self.project.add_student(student, self)
 
     def remove_student_from_project(self, student):
-
+        if not self.project:
+            raise ValidationError("User is not enrolled in a project")
+        self.project.remove_student(student, self)
 
     
 
