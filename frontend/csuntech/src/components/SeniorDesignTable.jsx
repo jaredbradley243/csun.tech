@@ -8,7 +8,7 @@ export default function SeniorDesignTable(props) {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   // Color set for mobile-project-header
-  const colorSet = ["#73BBC9", "#4942E4", "#374259", "#DEA704"];
+  const colorSet = ["#82CEC9", "#92A1CD", "#2CA5DA", "#5B4C93"];
 
   function pickColor(index) {
     const colorIndex = index % 4;
