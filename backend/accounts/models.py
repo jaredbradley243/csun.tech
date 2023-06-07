@@ -10,7 +10,8 @@ from django.core.validators import (
     MinLengthValidator,
     MaxLengthValidator,
 )
-from django.forms import ValidationError
+
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from csuntech.settings import AUTH_USER_MODEL
 
 
@@ -153,8 +154,24 @@ class StudentProfile(UserProfile):
     )
 
     def join_project(self, project):
+        if not self.is_student:
+            raise PermissionDenied("Only students can join projects")
+        if self.project:
+            raise PermissionDenied("Student is already enrolled in a project")
+        if project.open_slots <= 0:
+            raise PermissionDenied("No available slots in the project")
+        self.project = project
+        self.save()
+        project.open_slots -= 1
+        project.save()
 
-    def leave_project(self, project):
+    def leave_project(self):
+        if not self.project:
+            raise PermissionDenied("Student is not enrolled in a project")
+        self.project.open_slots += 1
+        self.project.save()
+        self.project = None
+        self.save()
     
 
 class TeamLeadProfile(StudentProfile):
@@ -163,7 +180,9 @@ class TeamLeadProfile(StudentProfile):
     
     def add_student_to_project(self, student):
 
+
     def remove_student_from_project(self, student):
+
 
     
 
@@ -179,13 +198,18 @@ class ProfessorProfile(UserProfile):
 
     def create_project(self, project_name, project_description, open_slots, capacity, relevant_skills, meeting_schedule):
 
+
     def edit_project(self, project, **kwargs):
+
 
     def delete_project(self, project):
 
+
     def add_student_to_project(self, student):
 
+
     def remove_student_from_project(self, student):
+
 
 
 # This signal receiver creates a UserProfile instance when a new CustomUser is created.
