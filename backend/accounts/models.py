@@ -13,6 +13,7 @@ from django.core.validators import (
 
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from csuntech.settings import AUTH_USER_MODEL
+from projects.models import Project
 
 
 def validate_integer(value):
@@ -163,12 +164,12 @@ class StudentProfile(UserProfile):
         if not self.project:
             raise ValidationError("You're not enrolled in a project")
         self.project.remove_student(self)
-    
+
 
 class TeamLeadProfile(StudentProfile):
     class Meta:
         proxy = True
-    
+
     def add_student_to_project(self, student):
         if not self.project:
             raise ValidationError("User is not enrolled in a project")
@@ -179,10 +180,8 @@ class TeamLeadProfile(StudentProfile):
             raise ValidationError("User is not enrolled in a project")
         self.project.remove_student(student, self)
 
-    
 
 class ProfessorProfile(UserProfile):
-
     rate_my_professor_link = models.URLField(blank=True, null=True)
     csun_faculty_page_link = models.URLField(blank=True, null=True)
     projects = models.ManyToManyField(
@@ -191,20 +190,34 @@ class ProfessorProfile(UserProfile):
         blank=True,
     )
 
-    def create_project(self, project_name, project_description, open_slots, capacity, relevant_skills, meeting_schedule):
+    def create_project(
+        self,
+        project_name,
+        open_slots,
+        capacity,
+        meeting_schedule,
+        project_description=None,
+        relevant_skills=None,
+    ):
+        if not self.is_professor:
+            raise PermissionDenied("Only professors can create projects")
+        project = Project.objects.create(
+            project_name=project_name,
+            project_description=project_description,
+            open_slots=open_slots,
+            capacity=capacity,
+            relevant_skills=relevant_skills,
+            meeting_schedule=meeting_schedule,
+        )
+        self.projects.add(project)
 
+    # def edit_project(self, project, **kwargs):
 
-    def edit_project(self, project, **kwargs):
+    # def delete_project(self, project):
 
+    # def add_student_to_project(self, student):
 
-    def delete_project(self, project):
-
-
-    def add_student_to_project(self, student):
-
-
-    def remove_student_from_project(self, student):
-
+    # def remove_student_from_project(self, student):
 
 
 # This signal receiver creates a UserProfile instance when a new CustomUser is created.
