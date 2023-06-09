@@ -6,22 +6,18 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 class Project(models.Model):
     project_name = models.CharField(null=False, max_length=100, unique=True)
     project_description = models.CharField(null=True, blank=True, max_length=500)
-    open_slots = models.IntegerField(
-        null=True, blank=True, validators=[MaxValueValidator(2)]
-    )
-    capacity = models.IntegerField(
-        null=True, blank=True, validators=[MaxValueValidator(2)]
-    )
+    open_slots = models.IntegerField(validators=[MaxValueValidator(2)])
+    capacity = models.IntegerField(validators=[MaxValueValidator(2)])
     relevant_skills = models.CharField(null=True, blank=True, max_length=500)
     meeting_schedule = models.ManyToManyField("MeetingTime")
 
     def __str__(self):
         return self.project_name
 
-    def add_student(self, student, user=None):
-        if user and not (user.is_team_lead or user.is_professor):
+    def add_student(self, student, authority=None):
+        if authority and not (authority.is_team_lead or authority.is_professor):
             raise PermissionDenied("Only Team Leads or Professors can add students")
-        if user and user.is_team_lead and user.project != self:
+        if authority and authority.is_team_lead and authority.project != self:
             raise PermissionDenied("Team Lead can only add students to their project")
         if student.project:
             raise ValidationError("Selected student is already enrolled in a project")
@@ -32,14 +28,14 @@ class Project(models.Model):
         student.project = self
         student.save()
 
-    def remove_student(self, student, user=None):
-        if user and not (user.is_team_lead or user.is_professor):
+    def remove_student(self, student, authority=None):
+        if authority and not (authority.is_team_lead or authority.is_professor):
             raise PermissionDenied("Only Team Leads or Professors can remove students")
         if not student.project:
             raise ValidationError("Selected student is not enrolled in a project")
         if student.project != self:
             raise ValidationError("Student is not enrolled in this project")
-        if user and (user.is_team_lead and user.project != self):
+        if authority and (authority.is_team_lead and authority.project != self):
             raise PermissionDenied(
                 "Team Lead can only remove students from their project"
             )
@@ -49,7 +45,7 @@ class Project(models.Model):
         self.save()
 
 
-class DayofWeek:
+class DayofWeek(models.TextChoices):
     MONDAY = "MON"
     TUESDAY = "TUE"
     WEDNESDAY = "WED"
@@ -57,19 +53,10 @@ class DayofWeek:
     FRIDAY = "FRI"
     SATURDAY = "SAT"
     SUNDAY = "SUN"
-    CHOICES = [
-        (MONDAY, "M"),
-        (TUESDAY, "T"),
-        (WEDNESDAY, "W"),
-        (THURSDAY, "Th"),
-        (FRIDAY, "F"),
-        (SATURDAY, "S"),
-        (SUNDAY, "Su"),
-    ]
 
 
 class MeetingTime(models.Model):
-    day_of_week = models.CharField(max_length=3, choices=DayofWeek.CHOICES)
+    day_of_week = models.CharField(max_length=3, choices=DayofWeek.choices)
     start_time = models.TimeField()
     end_time = models.TimeField()
 
