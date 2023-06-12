@@ -124,6 +124,13 @@ class CustomUserAdmin(UserAdmin):
     def get_project(self, obj):
         if hasattr(obj.profile, "studentprofile"):
             return obj.profile.studentprofile.project
+        elif hasattr(obj.profile, "professorprofile"):
+            return ", ".join(
+                [
+                    str(project)
+                    for project in obj.profile.professorprofile.projects.all()
+                ]
+            )
         return None
 
     get_project.short_description = "Project"
