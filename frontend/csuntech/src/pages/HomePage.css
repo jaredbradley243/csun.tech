@@ -1,6 +1,11 @@
 :root {
   --homepage-text-color: #000;
   --homepage-background-color: #ffffff;
+  --page-button-text-color: black;
+  --page-button-bg-color: initial;
+  --page-button-border: #dddddd;
+  --page-button-active-text-color: #ffffff;
+  --page-button-active-bg-color: #1e2124;
 }
 
 .darkMode {
@@ -17,4 +22,26 @@
 .homePage_container {
   color: var(--homepage-text-color);
   background-color: var(--homepage-background-color);
+}
+
+.homePage_pagination {
+  display: block;
+  margin: 0 auto;
+  width: max-content;
+}
+
+.homePage_pagination button {
+  margin: 0 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: 300ms ease-in-out;
+  color: var(--page-button-text-color);
+  background-color: var(--page-button-bg-color);
+  border: 1px solid var(--page-button-border);
+}
+
+.homePage_pagination .active {
+  color: var(--page-button-active-text-color);
+  background-color: var(--page-button-active-bg-color);
+  border: 1px solid var(--page-button-active-bg-color);
 }
