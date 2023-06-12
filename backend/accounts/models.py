@@ -154,7 +154,6 @@ class StudentProfile(UserProfile):
         on_delete=models.CASCADE,
     )
 
-    # TODO: Join_project and leave_project need to be refactored into project model
     def join_project(self, project):
         if self.project:
             raise ValidationError("You're already enrolled in a project")
@@ -195,7 +194,7 @@ class ProfessorProfile(UserProfile):
         project_name,
         open_slots,
         capacity,
-        meeting_schedule,
+        # meeting_schedule=None,
         project_description=None,
         relevant_skills=None,
     ):
@@ -207,9 +206,11 @@ class ProfessorProfile(UserProfile):
             open_slots=open_slots,
             capacity=capacity,
             relevant_skills=relevant_skills,
-            meeting_schedule=meeting_schedule,
+            # meeting_schedule=meeting_schedule,
         )
         self.projects.add(project)
+
+    # TODO: Create Function to Leave Project
 
     # def edit_project(self, project, **kwargs):
 
