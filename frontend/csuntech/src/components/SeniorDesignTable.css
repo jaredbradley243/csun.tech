@@ -16,8 +16,10 @@
 }
 
 .designTable {
+  width: 90%;
   overflow: hidden;
   text-align: center;
+  width: 80%;
   overflow: hidden;
 }
 
@@ -42,6 +44,10 @@
 
 .designTable_header {
   color: var(--designtable-header-text-color);
+}
+
+.designTable_redAlert {
+  color: red;
 }
 
 .designTable_firstColumn .designTable_header {
