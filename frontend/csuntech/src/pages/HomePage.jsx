@@ -199,6 +199,50 @@ export default function HomePage() {
       skills: ["HTML", "CSS", "Javascript"],
       meetingTimes: "Tue, Wed 2-4pm",
     },
+    {
+      _id: 17,
+      name: "Project17",
+      professor: "professor17",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 18,
+      name: "Project18",
+      professor: "professor18",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 19,
+      name: "Project19",
+      professor: "professor19",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 20,
+      name: "Project20",
+      professor: "professor20",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
   ];
   // Professor Mock Data from Backend
   const professors = [
@@ -269,11 +313,8 @@ export default function HomePage() {
 
   function computeCurrProjectList() {
     let list = [];
-    if (currPage.current === 1) list = projects.slice(0, projectPerPage);
-    else {
-      const startIndex = (currPage.current - 1) * projectPerPage;
-      list = projects.slice(startIndex, startIndex * 2);
-    }
+    const startIndex = (currPage.current - 1) * projectPerPage;
+    list = projects.slice(startIndex, startIndex + projectPerPage);
     setCurrProjectList(list);
   }
 
