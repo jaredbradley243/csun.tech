@@ -243,6 +243,127 @@ export default function HomePage() {
       skills: ["HTML", "CSS", "Javascript"],
       meetingTimes: "Tue, Wed 2-4pm",
     },
+    {
+      _id: 21,
+      name: "Project21",
+      professor: "professor21",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 22,
+      name: "Project22",
+      professor: "professor22",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 23,
+      name: "Project23",
+      professor: "professor23",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 24,
+      name: "Project24",
+      professor: "professor24",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 25,
+      name: "Project25",
+      professor: "professor25",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 26,
+      name: "Project26",
+      professor: "professor26",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 27,
+      name: "Project27",
+      professor: "professor27",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 28,
+      name: "Project28",
+      professor: "professor28",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 29,
+      name: "Project29",
+      professor: "professor29",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 30,
+      name: "Project30",
+      professor: "professor30",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
+    {
+      _id: 31,
+      name: "Project31",
+      professor: "professor31",
+      openSpots: 3,
+      totalSpots: 30,
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo, modi. Adconsequatur facere sed!",
+      skills: ["HTML", "CSS", "Javascript"],
+      meetingTimes: "Tue, Wed 2-4pm",
+    },
   ];
   // Professor Mock Data from Backend
   const professors = [
