@@ -34,10 +34,13 @@
   margin: 0 4px;
   padding: 8px 16px;
   cursor: pointer;
-  transition: 300ms ease-in-out;
   color: var(--page-button-text-color);
   background-color: var(--page-button-bg-color);
   border: 1px solid var(--page-button-border);
+}
+
+.homePage_pagination span {
+  margin: 0 .2rem;
 }
 
 .homePage_pagination .active {

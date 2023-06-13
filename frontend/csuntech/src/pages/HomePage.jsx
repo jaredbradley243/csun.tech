@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect, useRef } from "react";
 import SeniorDesignTable from "../components/SeniorDesignTable";
@@ -12,9 +13,11 @@ export default function HomePage() {
   const [projectToOpen, setProjectToOpen] = useState(null);
   // the current professor in this prop will be opened in the porfessor Modal
   const [professorToOpen, setProfessorToOpen] = useState(null);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const currPage = useRef(1);
   const [totalPages, setTotalPages] = useState(0);
   const [currProjectList, setCurrProjectList] = useState([]);
+  const [pageBtns, setPageBtns] = useState([]);
   const pageBtnContainer = useRef();
   // Change this number to increase or decrease the num of projects displayed per page
   const projectPerPage = 6;
@@ -253,6 +256,17 @@ export default function HomePage() {
     setProfessorToOpen(professor);
   };
 
+  function handleScreenWidth() {
+    setScreenWidth(window.innerWidth);
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", handleScreenWidth);
+    return () => {
+      window.removeEventListener("resize", handleScreenWidth);
+    };
+  }, []);
+
   function computeCurrProjectList() {
     let list = [];
     if (currPage.current === 1) list = projects.slice(0, projectPerPage);
@@ -272,13 +286,79 @@ export default function HomePage() {
   useEffect(computeCurrProjectList, []);
 
   function makePageBtnActive() {
-    const pageBtns = Array.from(pageBtnContainer.current.children);
-    pageBtns.forEach((btn) => {
+    const pageBtnsList = Array.from(pageBtnContainer.current.children);
+    pageBtnsList.forEach((btn) => {
       if (parseInt(btn.getAttribute("data-btn-value"), 10) === currPage.current)
         btn.classList.add("active");
       else btn.classList.remove("active");
     });
   }
+
+  useEffect(makePageBtnActive, [pageBtns]);
+
+  function generatePageBtns() {
+    let buttons = [];
+    if (totalPages < 6) {
+      buttons = generatePageBtnsHelper(1, totalPages);
+    } else {
+      const firstBtn = (
+        <button
+          className="active"
+          key="1"
+          data-btn-value="1"
+          type="button"
+          onClick={changePage}
+        >
+          1
+        </button>
+      );
+      const lastBtn = (
+        <button
+          key={totalPages}
+          data-btn-value={totalPages}
+          type="button"
+          onClick={changePage}
+        >
+          {totalPages}
+        </button>
+      );
+      const spacingDots = [
+        <span key="spacing1">...</span>,
+        <span key="spacing2">...</span>,
+      ];
+      buttons.push(firstBtn);
+      if (currPage.current - 2 > 1) buttons.push(spacingDots[0]);
+
+      if (currPage.current < 3) {
+        buttons = buttons.concat(generatePageBtnsHelper(2, 4));
+      } else if (totalPages - currPage.current < 2) {
+        buttons = buttons.concat(
+          generatePageBtnsHelper(totalPages - 3, totalPages - 1)
+        );
+      } else {
+        buttons = buttons.concat(
+          generatePageBtnsHelper(currPage.current - 1, currPage.current + 1)
+        );
+      }
+
+      if (currPage.current + 2 < totalPages) buttons.push(spacingDots[1]);
+      buttons.push(lastBtn);
+    }
+    setPageBtns(buttons);
+  }
+
+  function generatePageBtnsHelper(start, end) {
+    const buttons = [];
+    for (let i = start; i <= end; i += 1)
+      buttons.push(
+        <button key={i} data-btn-value={i} type="button" onClick={changePage}>
+          {i}
+        </button>
+      );
+    return buttons;
+  }
+
+  useEffect(generatePageBtns, [totalPages]);
 
   function changePage(e) {
     const page = e.target.getAttribute("data-btn-value");
@@ -290,25 +370,8 @@ export default function HomePage() {
     if (page === "prev") currPage.current -= 1;
     else if (page === "next") currPage.current += 1;
     else currPage.current = parseInt(page, 10);
-    makePageBtnActive();
     computeCurrProjectList();
-  }
-
-  function generatePageBtns() {
-    const buttons = [];
-    for (let i = 1; i <= totalPages; i += 1)
-      buttons.push(
-        <button
-          className={i === 1 ? "active" : ""}
-          key={i}
-          data-btn-value={i}
-          type="button"
-          onClick={changePage}
-        >
-          {i}
-        </button>
-      );
-    return buttons;
+    generatePageBtns();
   }
 
   return (
@@ -321,13 +384,17 @@ export default function HomePage() {
         />
       </div>
       <div className="homePage_pagination" ref={pageBtnContainer}>
-        <button data-btn-value="prev" type="button" onClick={changePage}>
-          &laquo;
-        </button>
-        {generatePageBtns()}
-        <button data-btn-value="next" type="button" onClick={changePage}>
-          &raquo;
-        </button>
+        {screenWidth > 400 && (
+          <button data-btn-value="prev" type="button" onClick={changePage}>
+            &laquo;
+          </button>
+        )}
+        {pageBtns}
+        {screenWidth > 400 && (
+          <button data-btn-value="next" type="button" onClick={changePage}>
+            &raquo;
+          </button>
+        )}
       </div>
       {projectToOpen && (
         <ProjectModal
