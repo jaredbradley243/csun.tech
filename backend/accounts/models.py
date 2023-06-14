@@ -92,6 +92,7 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
 
 
+# Todo: Modify UserProfile to include student id for creating StudentProfile
 class UserProfile(models.Model):
     """
     UserProfile model stores additional user information not related to
@@ -221,6 +222,7 @@ class ProfessorProfile(UserProfile):
     # def remove_student_from_project(self, student):
 
 
+# Todo: Modify receiver to include student id when creating StudentProfile
 # This signal receiver creates a UserProfile instance when a new CustomUser is created.
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
