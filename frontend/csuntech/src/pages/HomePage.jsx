@@ -12,7 +12,6 @@ export default function HomePage() {
   const [projectToOpen, setProjectToOpen] = useState(null);
   // the current professor in this prop will be opened in the porfessor Modal
   const [professorToOpen, setProfessorToOpen] = useState(null);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const currPage = useRef(1);
   const [totalPages, setTotalPages] = useState(0);
   const [currProjectList, setCurrProjectList] = useState([]);
@@ -420,17 +419,6 @@ export default function HomePage() {
     setProfessorToOpen(professor);
   };
 
-  function handleScreenWidth() {
-    setScreenWidth(window.innerWidth);
-  }
-
-  useEffect(() => {
-    window.addEventListener("resize", handleScreenWidth);
-    return () => {
-      window.removeEventListener("resize", handleScreenWidth);
-    };
-  }, []);
-
   function computeCurrProjectList() {
     let list = [];
     const startIndex = (currPage.current - 1) * projectPerPage;
@@ -545,17 +533,23 @@ export default function HomePage() {
         />
       </div>
       <div className="homePage_pagination" ref={pageBtnContainer}>
-        {screenWidth > 400 && (
-          <button data-btn-value="prev" type="button" onClick={changePage}>
-            &laquo;
-          </button>
-        )}
+        <button
+          id="prev"
+          data-btn-value="prev"
+          type="button"
+          onClick={changePage}
+        >
+          &laquo;
+        </button>
         {pageBtns}
-        {screenWidth > 400 && (
-          <button data-btn-value="next" type="button" onClick={changePage}>
-            &raquo;
-          </button>
-        )}
+        <button
+          id="next"
+          data-btn-value="next"
+          type="button"
+          onClick={changePage}
+        >
+          &raquo;
+        </button>
       </div>
       {projectToOpen && (
         <ProjectModal
