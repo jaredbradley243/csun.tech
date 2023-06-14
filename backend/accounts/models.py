@@ -129,6 +129,7 @@ class UserProfile(models.Model):
             return "unknown"
 
 
+# TODO: Modify StudentProfile to include 492 vs 493
 class StudentProfile(UserProfile):
     team_lead = models.BooleanField(default=False, blank=True)
     is_volunteer = models.BooleanField(default=False, verbose_name="volunteer")
