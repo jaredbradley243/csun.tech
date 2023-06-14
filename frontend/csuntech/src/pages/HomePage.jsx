@@ -5,7 +5,6 @@ import SeniorDesignTable from "../components/SeniorDesignTable";
 import "./HomePage.css";
 import ProjectModal from "../components/ProjectModal";
 import ProfessorModal from "../components/ProfessorModal";
-import Footer from "../layouts/Footer";
 
 export default function HomePage() {
   // the current project saved in this prop will be opened in the project Modal
@@ -570,7 +569,6 @@ export default function HomePage() {
           closeProfessorModal={closeProfessorModal}
         />
       )}
-      <Footer />
     </div>
   );
 }
