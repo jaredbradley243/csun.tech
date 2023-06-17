@@ -6,6 +6,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Signup from "./pages/Signup";
 import HomePage from "./pages/HomePage";
 import Header from "./layouts/Header";
+import TimePicker from "./components/TimePicker";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(
@@ -25,6 +26,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="*" element={<ErrorPage />} />
+        <Route path="/timepicker" element={<TimePicker />} />
       </Routes>
     </div>
   );
