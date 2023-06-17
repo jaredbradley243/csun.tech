@@ -1,0 +1,136 @@
+:root {
+    --time-picker-bg-color: #eef7fc;
+    --time-picker-text-color: #212A3E;
+    --time-picker-dark-bg-color: #e9f0fa;
+    --time-picker-bg-color-active: #d3e2f8;
+    --time-picker-outline-color: #394867;
+    --time-picker-meridiem-active: #95c5f3;
+    --time-picker-meridiem-border: #394867;
+}
+
+.darkMode {
+    /* Color Variables for Dark Mode */
+}
+
+.timePicker_container {
+    text-align: right;
+    width: max-content;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    color: var(--time-picker-text-color);
+    background-color: var(--time-picker-bg-color);
+}
+
+.timePicker_container>p {
+    cursor: default;
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+.timePicker_container>button {
+    text-align: right;
+    color: var(--time-picker-text-color);
+    padding: .5rem;
+    margin-top: 1.5rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: inherit;
+}
+
+.timePicker_container>button:hover {
+    outline: 1px solid var(--time-picker-text-color);
+}
+
+.timePicker {
+    color: var(--time-picker-text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+}
+
+.timePicker_hour,
+.timePicker_min {
+    width: 71px;
+    text-align: center;
+    font-size: 2rem;
+    padding: .7rem 1rem;
+
+    outline-offset: -2px;
+    border: none;
+    border-radius: 10px;
+
+    color: inherit;
+    background-color: var(--time-picker-dark-bg-color);
+    cursor: text;
+    caret-color: var(--time-picker-outline-color);
+}
+
+.timePicker_hour:focus,
+.timePicker_min:focus {
+    outline: 2px solid var(--time-picker-outline-color);
+    background-color: var(--time-picker-bg-color-active);
+}
+
+.timePicker_hourLabel,
+.timePicker_minLabel {
+    position: relative;
+}
+
+.timePicker_hourLabel::after {
+    content: "Hour";
+}
+
+.timePicker_minLabel::after {
+    content: "Minute";
+}
+
+.timePicker_hourLabel::after,
+.timePicker_minLabel::after {
+    position: absolute;
+    top: 110%;
+    left: 0px;
+
+    font-size: .8rem;
+    color: var(--time-picker-text-color);
+    cursor: default;
+}
+
+.timePicker_dot {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timePicker_dot>span {
+    background-color: var(--time-picker-text-color);
+    border-radius: 50%;
+    width: 4px;
+    height: 4px;
+}
+
+.timePicker_meridiem {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid var(--time-picker-meridiem-border);
+    overflow: hidden;
+}
+
+.timePicker_meridiem>button {
+    border: none;
+    color: inherit;
+    background-color: inherit;
+    cursor: pointer;
+    padding: .3rem;
+}
+
+.timePicker_meridiem>button.active {
+    background-color: var(--time-picker-meridiem-active);
+}
+
+.timePicker_meridiem>button:first-child {
+    border-bottom: 1px solid var(--time-picker-meridiem-border);
+}
