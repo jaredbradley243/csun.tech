@@ -1,0 +1,119 @@
+:root {
+    /* Btn Scheme */
+    --daypicker-day-btn-color: #0d6efd;
+    --daypicker-day-btn-bg-color: #fff;
+    --daypicker-day-btn-border-color: #b9b9b9;
+    /* Hover Scheme */
+    --daypicker-day-btn-bg-color-hover: #b6d4fe;
+}
+
+.dayPicker_day {
+    margin: 4px;
+    background-color: transparent;
+    border-radius: 50%;
+    border: 1px solid var(--daypicker-day-btn-color);
+    overflow: hidden;
+    float: left;
+}
+
+.dayPicker_dayTrue {
+    margin: 4px;
+    background-color: transparent;
+    border-radius: 50%;
+    border: none;
+    overflow: hidden;
+    float: left;
+}
+
+.dayPicker_btnLabel {
+    float: left;
+    line-height: 2.5em;
+    width: 3.0em;
+    height: 3.0em;
+}
+
+.dayPicker_btnCheckbox {
+    position: absolute;
+    display: none;
+    color: #fff;
+}
+
+.dayPicker_btnText {
+    height: inherit;
+    text-align: center;
+    padding: 3px 0;
+    display: block;
+    color: var(--daypicker-day-btn-color)
+}
+
+.dayPicker_btnLabel:hover {
+    border-color: var(--daypicker-day-btn-bg-color-hover);
+    background-color: var(--daypicker-day-btn-bg-color-hover);
+    cursor: pointer;
+}
+
+.dayPicker_btnCheckbox:checked + label>span {
+    background-color: var(--daypicker-day-btn-color);
+    color: var(--daypicker-day-btn-bg-color)
+}
+
+
+
+
+
+
+
+
+
+/* .dayPicker_dayContainer {
+    position: relative;
+    float: left;
+}
+
+.dayPicker_btnCheckbox {
+    display: none;
+}
+
+.dayPicker_btnLabel {
+    display: block;
+    text-align: center;
+    height: 40px;
+    width: 40px;
+    padding: .1rem;
+    border: 1px solid var(--daypicker-day-btn-color);
+    border-radius: 50%;
+    border-color: var(--daypicker-day-btn-color);
+    color: var(--daypicker-day-btn-color);
+    background-color: transparent;
+}
+
+.dayPicker_btnLabel:hover {
+    border-color: var(--daypicker-day-btn-bg-color-hover);
+    background-color: var(--daypicker-day-btn-bg-color-hover);
+    cursor: pointer;
+}
+
+.dayPicker_btnCheckbox:checked + .dayPicker_btnLabel {
+    background-color: var(--daypicker-day-btn-color);
+    color: var(--daypicker-day-btn-bg-color)
+}
+
+/* Original */
+
+/* .dayPicker_dayBtn {
+    height: 40px;
+    width: 40px;
+    padding: .1rem;
+    margin: .5rem .1rem  1rem;
+    border: 1px solid var(--daypicker-day-btn-color);
+    border-radius: 50%;
+    border-color: var(--daypicker-day-btn-color);
+    color: var(--daypicker-day-btn-color);
+    background-color: transparent;
+}
+
+.dayPicker_dayBtn:hover {
+    border-color: var(--daypicker-day-btn-bg-color-hover);
+    background-color: var(--daypicker-day-btn-bg-color-hover);
+    cursor: pointer;
+} */
