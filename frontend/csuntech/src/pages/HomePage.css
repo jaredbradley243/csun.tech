@@ -54,7 +54,7 @@
   border: 1px solid var(--page-button-active-bg-color);
 }
 
-@media screen and (min-width: 400px) {
+@media screen and (min-width: 500px) {
   .homePage_pagination #prev,
     .homePage_pagination #next {
       display: inline-block;
