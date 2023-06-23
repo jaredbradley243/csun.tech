@@ -6,6 +6,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Signup from "./pages/Signup";
 import HomePage from "./pages/HomePage";
 import Header from "./layouts/Header";
+import Footer from "./layouts/Footer";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(
@@ -26,6 +27,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
+      <Footer />
     </div>
   );
 }
