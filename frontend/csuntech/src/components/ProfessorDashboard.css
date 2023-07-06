@@ -28,6 +28,7 @@
 
     /* Project Table Colors */
     --professor-dashboard-edit-btn-color: #008ee4;
+    --professor-dashboard-edit-btn-bg-color: #fff;
 }   
 
 .professorDashboard button {
@@ -219,6 +220,7 @@
     box-shadow: 2px 2px 10px var(--professor-dashboard-filter-box-shadow);
 
     display: none;
+    z-index: 1;
     flex-direction: column;
     padding: 1rem 1.5rem;
     background-color: var(--professor-dashboard-filter-bg-color);
@@ -290,7 +292,7 @@
     display: grid;
     border: 1px solid var(--professor-dashboard-border-color);
     background-color: var(--professor-dashboard-table-bg-color);
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 
 .professorDashboard_table > * {
@@ -343,6 +345,7 @@
 }
 
 .professorDashboard_delBtn {
+    padding: .5rem;
     color: var(--professor-dashboard-del-btn-color);
     background-color: var(--professor-dashboard-del-btn-bg-color);
 }
@@ -370,6 +373,10 @@
 }
 
 .professorDashboard_editBtn:hover {
-    color: white;
+    color: var(--professor-dashboard-edit-btn-bg-color);
     background-color: var(--professor-dashboard-edit-btn-color);
+}
+
+.professorDashboard_editProjectBtnContainer {
+    position: relative;
 }

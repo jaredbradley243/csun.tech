@@ -5,6 +5,7 @@
 // TODO: Delete below after implementing all functions
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
+import EditProjectModal from "./EditProjectModal";
 import "./ProfessorDashboard.css";
 
 export default function ProfessorDashboard() {
@@ -22,6 +23,8 @@ export default function ProfessorDashboard() {
   // currFilters become active only when save button is clicked
   const [activeFilters, setActiveFilters] = useState([]);
   const filterForm = useRef();
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
+  const [currProjectToEdit, setCurrProjectToEdit] = useState(null);
 
   // Mock data for students table
   const students = [
@@ -356,9 +359,10 @@ export default function ProfessorDashboard() {
         {/* Table Header */}
         <label
           className="professorDashboard_checkboxLabel header"
-          htmlFor="All Students"
+          htmlFor="select-all-students"
         >
           <input
+            id="select-all-students"
             type="checkbox"
             onChange={selectAllCheckboxes}
             checked={selectAll}
@@ -408,10 +412,11 @@ export default function ProfessorDashboard() {
         {displayedStudents.map((student) => (
           <React.Fragment key={student._id}>
             <label
-              htmlFor="student"
+              htmlFor="select-student"
               className="professorDashboard_checkboxLabel"
             >
               <input
+                id="select-student"
                 type="checkbox"
                 onChange={handleCheckbox}
                 ref={addToCheckboxes}
@@ -447,7 +452,6 @@ export default function ProfessorDashboard() {
   }
 
   /** PROJECT TABLE */
-
   function addNewProject() {
     // TODO
   }
@@ -459,10 +463,18 @@ export default function ProfessorDashboard() {
     }
   }
 
-  function editProject(e) {
-    // TODO
-    // const projectId = e.target.getAttribute("data-project-id");
+  function openEditProjectModal(e) {
+    setIsEditProjectModalOpen(true);
+    const projectId = e.target.getAttribute("data-project-id");
+    const projectIndex = projects.findIndex(
+      (project) => project._id === parseInt(projectId, 10)
+    );
+    setCurrProjectToEdit(projects[projectIndex]);
   }
+
+  const closeEditProjectModal = () => {
+    setIsEditProjectModalOpen(false);
+  };
 
   // Return project table JSX
   function generateProjectTable() {
@@ -470,10 +482,11 @@ export default function ProfessorDashboard() {
       <div className="professorDashboard_table projectTable">
         {/* Table Header */}
         <label
-          htmlFor="All Projects"
+          htmlFor="select-all-projects"
           className="professorDashboard_checkboxLabel header"
         >
           <input
+            id="select-all-projects"
             type="checkbox"
             onChange={selectAllCheckboxes}
             checked={selectAll}
@@ -505,10 +518,11 @@ export default function ProfessorDashboard() {
         {displayedProjects.map((project) => (
           <React.Fragment key={project._id}>
             <label
-              htmlFor="student"
+              htmlFor="select-project"
               className="professorDashboard_checkboxLabel"
             >
               <input
+                id="select-project"
                 type="checkbox"
                 onChange={handleCheckbox}
                 ref={addToCheckboxes}
@@ -523,15 +537,24 @@ export default function ProfessorDashboard() {
             <div>{`${project.openSpots} / ${project.capacity}`}</div>
             <div>{project.skills.join(", ")}</div>
             <div>{project.meetingSchedule}</div>
-            <div>
+            <div className="professorDashboard_editProjectBtnContainer">
               <button
                 type="button"
                 data-project-id={project._id}
-                onClick={editProject}
+                onClick={openEditProjectModal}
                 className="professorDashboard_btn professorDashboard_editBtn"
               >
                 Edit
               </button>
+              {/* Edit Project Modal */}
+              {isEditProjectModalOpen && (
+                <EditProjectModal
+                  projectId={project._id}
+                  currProjectToEdit={currProjectToEdit}
+                  setCurrProjectToEdit={setCurrProjectToEdit}
+                  closeEditProjectModal={closeEditProjectModal}
+                />
+              )}
             </div>
           </React.Fragment>
         ))}
@@ -574,10 +597,11 @@ export default function ProfessorDashboard() {
           </h3>
           <div className="professorDashboard_topSectionRight">
             <label
-              htmlFor={isStudentTable ? "Search Student" : "Search Project"}
+              htmlFor={isStudentTable ? "search-student" : "search-student"}
             >
               <div className="professorDashboard_searchBarContainer">
                 <input
+                  id={isStudentTable ? "search-student" : "search-student"}
                   type="text"
                   className="professorDashboard_searchBar"
                   placeholder="search"
@@ -596,71 +620,73 @@ export default function ProfessorDashboard() {
                 </button>
               </div>
             </label>
-            <div className="professorDashboard_filterContainer">
-              <button
-                type="button"
-                className="professorDashboard_btn professorDashboard_filterBtn"
-                onClick={handleFilterDropdown}
-              >
-                Filters
-              </button>
-              <form
-                className={
-                  openFilterDropdown
-                    ? "professorDashboard_filterDropDown active"
-                    : "professorDashboard_filterDropDown"
-                }
-                ref={filterForm}
-              >
-                <h3>Filters</h3>
-                <label htmlFor="COMP 492">
-                  <input
-                    type="checkbox"
-                    id="COMP 492"
-                    value="COMP 492"
-                    onClick={handleFilterCheckbox}
-                  />{" "}
-                  COMP 492
-                </label>
-                <label htmlFor="COMP 493">
-                  <input
-                    type="checkbox"
-                    id="COMP 493"
-                    value="COMP 493"
-                    onClick={handleFilterCheckbox}
-                  />{" "}
-                  COMP 493
-                </label>
-                <label htmlFor="Volunteer">
-                  <input
-                    type="checkbox"
-                    id="Volunteer"
-                    value="volunteer"
-                    onClick={handleFilterCheckbox}
-                  />{" "}
-                  Volunteer
-                </label>
-                <label htmlFor="Team Lead">
-                  <input
-                    type="checkbox"
-                    id="Team Lead"
-                    value="teamLead"
-                    onClick={handleFilterCheckbox}
-                  />{" "}
-                  Team Lead
-                </label>
-                <label htmlFor="Project">
-                  <input type="checkbox" id="Project" /> Project
-                </label>
+            {isStudentTable && (
+              <div className="professorDashboard_filterContainer">
                 <button
                   type="button"
-                  onClick={saveStudentFilter}
-                  className="professorDashboard_btn professorDashboard_filterSaveBtn"
+                  className="professorDashboard_btn professorDashboard_filterBtn"
+                  onClick={handleFilterDropdown}
                 >
-                  Save
+                  Filters
                 </button>
-              </form>
-            </div>
+                <form
+                  className={
+                    openFilterDropdown
+                      ? "professorDashboard_filterDropDown active"
+                      : "professorDashboard_filterDropDown"
+                  }
+                  ref={filterForm}
+                >
+                  <h3>Filters</h3>
+                  <label htmlFor="comp-492">
+                    <input
+                      id="comp-492"
+                      type="checkbox"
+                      value="COMP 492"
+                      onClick={handleFilterCheckbox}
+                    />{" "}
+                    COMP 492
+                  </label>
+                  <label htmlFor="comp-493">
+                    <input
+                      id="comp-493"
+                      type="checkbox"
+                      value="COMP 493"
+                      onClick={handleFilterCheckbox}
+                    />{" "}
+                    COMP 493
+                  </label>
+                  <label htmlFor="volunteer">
+                    <input
+                      id="volunteer"
+                      type="checkbox"
+                      value="volunteer"
+                      onClick={handleFilterCheckbox}
+                    />{" "}
+                    Volunteer
+                  </label>
+                  <label htmlFor="team-lead">
+                    <input
+                      id="team-lead"
+                      type="checkbox"
+                      value="teamLead"
+                      onClick={handleFilterCheckbox}
+                    />{" "}
+                    Team Lead
+                  </label>
+                  <label htmlFor="project">
+                    <input id="project" type="checkbox" /> Project
+                  </label>
+                  <button
+                    type="button"
+                    onClick={saveStudentFilter}
+                    className="professorDashboard_btn professorDashboard_filterSaveBtn"
+                  >
+                    Save
+                  </button>
+                </form>
+              </div>
+            )}
             <button
               type="button"
               className="professorDashboard_addStudentBtn"
