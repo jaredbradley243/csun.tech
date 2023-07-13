@@ -5,26 +5,41 @@
     --edit-project-modal-edit-btn-bg-color: #fff;
     --edit-project-modal-cancel-btn-color: #df0606;
     --edit-project-modal-cancel-btn-bg-color: #fff;
+    --edit-project-modal-wrapper-bg-color: rgba(0, 0, 0, 0.3);
+}
+
+.editProjectModalWrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 240px;
+    width: auto !important;
+    padding: 0 !important;
+    z-index: 999;
+
+    background-color: var(--edit-project-modal-wrapper-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .editProjectModal {
-    z-index: 1;
-    position: absolute;
     display: flex;
     flex-direction: column;
     gap: .8rem;
-    top: -40px;
-    right: 100px;
     width: max-content;
     padding: 1rem 2rem;
 
     border: 1px solid var(--edit-project-modal-border-color);
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
     background-color: #fff;
     box-shadow: 0px 0px 10px var(--edit-project-modal-box-shadow);
 }
 
 .editProjectModal > h3 {
-    margin: 0.5rem 0 0 0;
+    margin: 0;
 }
 
 .editProjectModal input, .editProjectModal textarea {

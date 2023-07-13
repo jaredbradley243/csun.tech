@@ -208,6 +208,7 @@ export default function ProfessorDashboard() {
   function toggleTables(e) {
     if (e.target.id === "studentTable") setIsStudentTable(true);
     else setIsStudentTable(false);
+    closeEditProjectModal();
   }
 
   function handleFilterDropdown() {
@@ -546,19 +547,18 @@ export default function ProfessorDashboard() {
               >
                 Edit
               </button>
+            </div>
+          </React.Fragment>
+        ))}
               {/* Edit Project Modal */}
               {isEditProjectModalOpen && (
                 <EditProjectModal
-                  projectId={project._id}
                   currProjectToEdit={currProjectToEdit}
                   setCurrProjectToEdit={setCurrProjectToEdit}
                   closeEditProjectModal={closeEditProjectModal}
                 />
               )}
             </div>
-          </React.Fragment>
-        ))}
-      </div>
     );
   }
 
