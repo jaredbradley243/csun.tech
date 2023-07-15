@@ -19,6 +19,7 @@ export default function HomePage() {
   const [projectToOpen, setProjectToOpen] = useState(null);
   // the current professor in this prop will be opened in the porfessor Modal
   const [professorToOpen, setProfessorToOpen] = useState(null);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const currPage = useRef(1);
   const [totalPages, setTotalPages] = useState(0);
   const [projectsInCurrPage, setProjectsInCurrPage] = useState([]);
@@ -488,23 +489,17 @@ export default function HomePage() {
         />
       </div>
       <div className="homePage_pagination" ref={pageBtnContainer}>
-        <button
-          id="prev"
-          data-btn-value="prev"
-          type="button"
-          onClick={changePage}
-        >
-          &laquo;
-        </button>
+        {screenWidth > 400 && (
+          <button data-btn-value="prev" type="button" onClick={changePage}>
+            &laquo;
+          </button>
+        )}
         {pageBtns}
-        <button
-          id="next"
-          data-btn-value="next"
-          type="button"
-          onClick={changePage}
-        >
-          &raquo;
-        </button>
+        {screenWidth > 400 && (
+          <button data-btn-value="next" type="button" onClick={changePage}>
+            &raquo;
+          </button>
+        )}
       </div>
       {projectToOpen && (
         <ProjectModal
@@ -518,6 +513,7 @@ export default function HomePage() {
           closeProfessorModal={closeProfessorModal}
         />
       )}
+      <Footer />
     </div>
   );
 }
