@@ -191,6 +191,9 @@ class ProfessorProfile(UserProfile):
         blank=True,
     )
 
+    def get_projects(self):
+        return self.projects.all()
+
     def create_project(
         self,
         project_name,
@@ -212,15 +215,43 @@ class ProfessorProfile(UserProfile):
         )
         self.projects.add(project)
 
-    # TODO: Create Function to Leave Project
+    # TODO: Modify Function to error check
+    def leave_project(self, project):
+        self.projects.remove(project)
 
-    # def edit_project(self, project, **kwargs):
+    # TODO: Modify Function to error check
+    def edit_project(self, project, **kwargs):
+        if project in self.projects.all():
+            for attr, value in kwargs.items():
+                if hasattr(project, attr):
+                    setattr(project, attr, value)
+                else:
+                    raise ValidationError(f"Project has no attribute {attr}")
+            project.save()
+        else:
+            raise ValidationError("Professor is not associated with this project")
 
-    # def delete_project(self, project):
+    def delete_project(self, project):
+        if project in self.projects.all():
+            project.delete()
+        else:
+            raise ValidationError("Professor is not associated with this project")
 
-    # def add_student_to_project(self, student):
+    def add_student_to_project(self, student, project):
+        if project not in self.get_projects():
+            raise ValidationError("Project not found in professor's projects")
+        if student.project:
+            raise ValidationError("Selected student is already enrolled in a project")
+        project.add_student(student, self)
 
-    # def remove_student_from_project(self, student):
+    def remove_student_from_project(self, student, project):
+        if project not in self.get_projects():
+            raise ValidationError("Project not found in professor's projects")
+        if student.project != project:
+            raise ValidationError(
+                "Selected student is not enrolled in the selected project"
+            )
+        project.remove_student(student, self)
 
 
 # Todo: Modify receiver to include student id when creating StudentProfile

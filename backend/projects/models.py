@@ -6,8 +6,8 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 class Project(models.Model):
     project_name = models.CharField(null=False, max_length=100, unique=True)
     project_description = models.CharField(null=True, blank=True, max_length=500)
-    open_slots = models.IntegerField(validators=[MaxValueValidator(2)])
-    capacity = models.IntegerField(validators=[MaxValueValidator(2)])
+    open_slots = models.IntegerField(validators=[MaxValueValidator(99)])
+    capacity = models.IntegerField(validators=[MaxValueValidator(99)])
     relevant_skills = models.CharField(null=True, blank=True, max_length=500)
     meeting_schedule = models.ManyToManyField("MeetingTime")
 
