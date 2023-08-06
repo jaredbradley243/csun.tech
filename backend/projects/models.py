@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
 
-# from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
 
 # TODO: Add validation to ensure that open_slots can never exceed capacity
