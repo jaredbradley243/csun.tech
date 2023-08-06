@@ -11,7 +11,7 @@ from django.core.validators import (
     MaxLengthValidator,
 )
 
-from rest_framework.exceptions import ValidationError, PermissionDenied
+# from rest_framework.exceptions import ValidationError, PermissionDenied
 from csuntech.settings import AUTH_USER_MODEL
 from projects.models import Project
 

@@ -1,8 +1,10 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
-from rest_framework.exceptions import ValidationError, PermissionDenied
+
+# from rest_framework.exceptions import ValidationError, PermissionDenied
 
 
+# TODO: Add validation to ensure that open_slots can never exceed capacity
 class Project(models.Model):
     project_name = models.CharField(null=False, max_length=100, unique=True)
     project_description = models.CharField(null=True, blank=True, max_length=500)
@@ -55,6 +57,7 @@ class DayofWeek(models.TextChoices):
     SUNDAY = "SUN"
 
 
+# Todo: Add validation to ensure that start_time is earlier than end_time
 class MeetingTime(models.Model):
     day_of_week = models.CharField(max_length=3, choices=DayofWeek.choices)
     start_time = models.TimeField()
