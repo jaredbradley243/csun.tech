@@ -1,5 +1,10 @@
 from rest_framework import serializers
 from .models import Project, MeetingTime
+from accounts.serializers import (
+    ProfessorProfileSerializer,
+    CustomUserSerializer,
+    UserProfileSerializer,
+)
 
 
 class MeetingTimeSerializer(serializers.ModelSerializer):
@@ -10,6 +15,7 @@ class MeetingTimeSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     meeting_schedule = MeetingTimeSerializer(many=True)
+    professors = ProfessorProfileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project

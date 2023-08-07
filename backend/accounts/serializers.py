@@ -67,11 +67,13 @@ class StudentProfileSerializer(UserProfileSerializer):
         user.groups.set(groups_data)
 
         if user.email.endswith("@csun.edu"):
-            raise Exception("This user is not a student")
+            user.delete()
+            raise serializers.ValidationError("This user is not a student")
         elif user.email.endswith("@my.csun.edu"):
             user_profile = StudentProfile.objects.create(user=user, **validated_data)
         else:
-            raise Exception("Invalid email address")
+            user.delete()
+            raise serializers.ValidationError("Invalid email address")
         return user_profile
 
 
@@ -80,6 +82,9 @@ class TeamLeadProfileSerializer(StudentProfileSerializer):
         model = TeamLeadProfile
 
 
-class ProfessorProfileSerializer(UserProfileSerializer):
-    class Meta(UserProfileSerializer.Meta):
+class ProfessorProfileSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only=True)
+
+    class Meta:
         model = ProfessorProfile
+        fields = "__all__"  # or specify the fields you want to include
