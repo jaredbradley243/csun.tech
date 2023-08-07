@@ -31,6 +31,7 @@ from accounts.views import (
     UserProfileViewSet,
     StudentProfileViewSet,
 )
+from projects.views import ProjectsViewSet
 
 # urlpatterns = [
 #     path("admin/", admin.site.urls),
@@ -48,6 +49,7 @@ router = DefaultRouter()
 router.register(r"users", CustomUserViewSet)
 router.register(r"userprofiles", UserProfileViewSet)
 router.register(r"studentprofiles", StudentProfileViewSet)
+router.register(r"projects", ProjectsViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
