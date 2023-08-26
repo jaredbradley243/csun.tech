@@ -1,0 +1,75 @@
+.userSidebar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column
+}
+
+.active, .inactive {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+}
+
+svg {
+    width: 30px;
+    height: 30px;
+}
+
+.userSidebar .active svg {
+    color: white;
+}
+
+.userSidebar .inactive svg {
+    color: gray;
+}
+
+.inactive:hover {
+    background-color: rgb(246, 246, 246);
+    border-radius: 5px;
+    cursor: pointer;
+    color: rgb(226, 46, 46);
+}
+
+.active {
+    background-color: rgba(226, 46, 46, 0.85);
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+@media (max-width: 500px) {
+    .userSidebar {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .userSidebar .active, .userSidebar .inactive {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 5px 20px;
+    }
+
+    .userSidebar .active {
+        border-radius: 25px;
+        cursor: pointer;
+        /* box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); */
+    }
+
+    .userSidebar .inactive {
+        border-radius: 25px;
+        cursor: pointer;
+        /* box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); */
+    }
+
+    .userSidebar span {
+        font-size: 12px;
+
+    }
+}

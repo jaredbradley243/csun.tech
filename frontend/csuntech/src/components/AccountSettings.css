@@ -1,0 +1,90 @@
+.accountsettings {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+.accountsettings h1 {
+    padding: 10px 20px;
+}
+
+.accountsettings .settings-form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 20px;
+}
+
+.accountsettings .settings-form .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    margin: 10px;
+}
+
+.accountsettings .settings-form .form-group label {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+.accountsettings .settings-form .form-group input {
+    padding: 10px 20px;
+    border: 1px solid rgb(207, 207, 207);
+    border-radius: 5px;
+    outline: none;
+}
+
+.accountsettings .settings-form .form-group input:focus {
+    border: 1px solid rgb(30, 33, 36);
+}
+
+.saveBtn {
+    background: none;
+    border: 1px solid rgb(226, 46, 46);
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin: 1rem;
+    cursor: pointer;
+    color: rgb(226, 46, 46);
+}
+
+.saveBtn:hover {
+    background-color: rgb(226, 46, 46);
+    color: white;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 800px) {
+    .accountsettings h1 {
+        font-size: 20px;
+    }
+
+    .accountsettings .settings-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 10px 20px;
+    }
+
+    .accountsettings .settings-form .form-group {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        margin: 10px;
+    }
+
+    .accountsettings .settings-form .form-group label {
+        font-size: 16px;
+        font-weight: 300;
+        margin-bottom: 5px;
+    }
+}

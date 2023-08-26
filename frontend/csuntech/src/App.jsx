@@ -1,33 +1,35 @@
-import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom";
-import "./App.css";
-import Login from "./pages/Login";
-import ErrorPage from "./pages/ErrorPage";
-import Signup from "./pages/Signup";
-import HomePage from "./pages/HomePage";
-import Header from "./layouts/Header";
+import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
+import Login from './pages/Login';
+import ErrorPage from './pages/ErrorPage';
+import Signup from './pages/Signup';
+import HomePage from './pages/HomePage';
+import Header from './layouts/Header';
+import UserProfile from './pages/UserProfile';
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(
-    localStorage.getItem("isDarkMode") === "true"
-  );
+    const [isDarkMode, setIsDarkMode] = useState(
+        localStorage.getItem('isDarkMode') === 'true'
+    );
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem("isDarkMode", !isDarkMode);
-  };
+    const toggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
+        localStorage.setItem('isDarkMode', !isDarkMode);
+    };
 
-  return (
-    <div className={isDarkMode ? "App darkMode" : "App"}>
-      <Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-      <Routes>
-        <Route exact path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
-    </div>
-  );
+    return (
+        <div className={isDarkMode ? 'App darkMode' : 'App'}>
+            <Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+            <Routes>
+                <Route exact path="/" element={<HomePage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="*" element={<ErrorPage />} />
+                <Route path="/user/:activepage" element={<UserProfile />} />
+            </Routes>
+        </div>
+    );
 }
 
 export default App;
