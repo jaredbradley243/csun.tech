@@ -6,6 +6,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Signup from "./pages/Signup";
 import HomePage from "./pages/HomePage";
 import Header from "./layouts/Header";
+import ProfessorDashboard from "./components/ProfessorDashboard";
 import Footer from "./layouts/Footer";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="*" element={<ErrorPage />} />
+        <Route path="/professordashboard" element={<ProfessorDashboard />} />
       </Routes>
       <Footer />
     </div>

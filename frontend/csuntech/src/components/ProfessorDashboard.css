@@ -1,0 +1,382 @@
+:root {
+    /* Sidebar Colors */
+    --professor-dashboard-sidebar-text-color: #b0c0c9;
+    --professor-dashboard-active-text-color: #ffffff;
+    --professor-dashboard-sidebar-bg-color: #3b4a54;
+    --professor-dashboard-sidebar-dark-bg-color: #22303a;
+    --professor-dashboard-avatar-text-color: #ffffff;
+    --professor-dashboard-avatar-bg-color: #008ee4;
+
+    /* Main Content Colors */
+    --professor-dashboard-border-color: lightgray;
+    --professor-dashboard-main-bg-color: #f7f9fa;
+    --professor-dashboard-search-bar-outline: #1e2124;
+    --professor-dashboard-search-icon-color: #808080;  
+    --professor-dashboard-main-btn-color: #1e2124;
+    --professor-dashboard-filter-bg-color: #ffffff;
+    --professor-dashboard-filter-btn-bg-color: #ffffff;
+    --professor-dashboard-filter-box-shadow: rgba(0, 0, 0, 0.15);
+    --professor-dashboard-filter-save-btn-color: #1e2124;
+    --professor-dashboard-filter-save-btn-bg-color: #ffffff;
+    --professor-dashboard-active-filter-bg-color: #f5f2f2;
+    --professor-dashboard-table-bg-color: #ffffff;
+    --professor-dashboard-sortable-icon-color: #606060;
+
+    /* Student Table Colors */
+    --professor-dashboard-del-btn-color: #df0606;
+    --professor-dashboard-del-btn-bg-color: #fff;
+
+    /* Project Table Colors */
+    --professor-dashboard-edit-btn-color: #008ee4;
+    --professor-dashboard-edit-btn-bg-color: #fff;
+}   
+
+.professorDashboard button {
+    cursor: pointer;
+    transition: 100ms;
+}
+
+/* Professor Dashboard Sidebar CSS */
+
+.professorDashboard_sidebar {
+    position: fixed;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    padding: calc(2rem + 60px) 0;
+    font-size: 1rem;
+    z-index: 3;
+
+    color: var(--professor-dashboard-sidebar-text-color);
+    background-color: var(--professor-dashboard-sidebar-bg-color);
+}
+
+.professorDashboard_sidebar > h3 {
+    padding: 0 1rem;
+    margin: 2rem 0 1rem;
+    letter-spacing: .5px;
+    font-weight: normal;
+}
+
+.professorDashboard_profile {
+    position: relative;
+    margin-left: calc(35px + 1rem);
+    font-size: 1.2rem;
+    padding-right: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.professorDashboard_avatar {
+    position: absolute;
+    top: 50%;
+    left: -35px;
+    width: 30px;
+    height: 30px;
+    transform: translateY(-50%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    border-radius: 50%;
+    text-align: center;
+    color: var(--professor-dashboard-avatar-text-color);
+    background-color: var(--professor-dashboard-avatar-bg-color);
+}
+
+.professorDashboard_professorEmail {
+    font-size: .8rem;
+    font-style: italic;
+}
+
+.professorDashboard_sidebar > button {
+    padding: 1rem 0 1rem 2rem;
+    width: 100%;
+    text-align: left;
+    border: none;
+
+    font-size: inherit;
+    color: inherit;
+    background-color: inherit;
+}
+
+.professorDashboard_sidebar > button.active {
+    color: var(--professor-dashboard-active-text-color);
+    background-color: var(--professor-dashboard-sidebar-dark-bg-color);
+}
+
+/* Professor Dashboard Main Content CSS */
+
+.professorDashboard_mainContent {
+    margin-left: 240px;
+    font-size: 1rem;
+    padding: 2rem 5vw;
+    background-color: var(--professor-dashboard-main-bg-color);
+}
+
+.professorDashboard_btn {
+    width: max-content;
+    height: max-content;
+    padding: .5rem;
+
+    border: 1px solid;
+    border-radius: 5px;
+}
+
+.professorDashboard_table .bx {
+    pointer-events: none;
+    color: var(--professor-dashboard-sortable-icon-color);
+}
+
+.professorDashboard_table .bxs-sort-alt {
+    margin-left: 2px;
+    font-size: .9rem;
+}
+
+.professorDashboard_table .bxs-up-arrow, .professorDashboard_table .bxs-down-arrow {
+    margin-left: 4px;
+    font-size: .65rem;
+}
+
+.professorDashboard_topSection {
+    display: flex;
+    justify-content: space-between;
+}
+
+.professorDashboard_topSectionRight {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: .5rem;
+}
+
+.professorDashboard_title {
+    display: inline-block;
+    width: max-content;
+    margin: .6rem 0;
+}
+
+.professorDashboard_searchBarContainer {
+    position: relative;
+}
+
+.professorDashboard_searchBar {
+    font-size: .9rem;
+    padding: .5rem;
+    width: 250px;
+    border-radius: 30px;
+    border: 1px solid lightgrey;
+}
+
+.professorDashboard_searchIcon {
+    position: absolute;
+    width: max-content;
+    top: 55%;
+    right: 12px;
+    transform: translateY(-50%);
+
+    border: none;
+    padding: 0;
+    background-color: inherit;
+    color: var(--professor-dashboard-search-icon-color);
+    font-size: 1.2rem;
+}
+
+.professorDashboard_searchBar:focus-visible {
+    outline: 1.5px solid var(--professor-dashboard-search-bar-outline);
+}
+
+.professorDashboard_addStudentBtn {
+    border: none;
+    border-radius: 20px;
+    padding: .6rem 1rem;
+
+    font-size: .85rem;
+    letter-spacing: .5px;
+    color: #ffffff;
+    background-color: var(--professor-dashboard-main-btn-color);
+}
+
+.professorDashboard_filterContainer {
+    float: right;
+    width: max-content;
+    position: relative;
+    margin: 0 .5rem;
+}
+
+.professorDashboard_filterBtn {
+    background-color: var(--professor-dashboard-filter-bg-color);
+    border-radius: 20px;
+}
+
+.professorDashboard_filterDropDown {
+    position: absolute;
+    white-space: nowrap;
+    border: 1px solid var(--professor-dashboard-border-color);
+    border-radius: 5px;
+    min-width: 200px;
+    box-shadow: 2px 2px 10px var(--professor-dashboard-filter-box-shadow);
+
+    display: none;
+    z-index: 1;
+    flex-direction: column;
+    padding: 1rem 1.5rem;
+    background-color: var(--professor-dashboard-filter-bg-color);
+}
+
+.professorDashboard_filterDropDown.active {
+    display: flex;
+}
+
+.professorDashboard_filterDropDown > * {
+    margin: .5rem 0;
+}
+
+.professorDashboard_filterDropDown > h3 {
+    margin: .5rem 0;
+}
+
+.professorDashboard_filterResetBtn, .professorDashboard_filterSaveBtn {
+    border-radius: 30px;
+    transition: 100ms;
+}
+
+.professorDashboard_filterResetBtn {
+    font-size: inherit;
+    padding: .3rem .8rem;
+    color: var(--professor-dashboard-del-btn-color);
+    background-color: var(--professor-dashboard-del-btn-bg-color);
+}
+
+.professorDashboard_filterResetBtn:hover {
+    color: var(--professor-dashboard-del-btn-bg-color);
+    background-color: var(--professor-dashboard-del-btn-color);
+}
+
+.professorDashboard_filterSaveBtn {
+    width: 100%;
+    margin: .5rem 0;
+    color: var(--professor-dashboard-filter-save-btn-color);
+    background-color: var(--professor-dashboard-filter-save-btn-bg-color);
+}
+
+.professorDashboard_filterSaveBtn:hover {
+    color: var(--professor-dashboard-filter-save-btn-bg-color);
+    background-color: var(--professor-dashboard-filter-save-btn-color);
+}
+
+.professorDashboard_activeFitlerTitle {
+    margin: 1rem 0 .5rem;
+    font-weight: normal;
+}
+
+.professorDashboard_activeFilters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: .8rem;
+}
+
+.professorDashboard_activeFilter {
+    border: 1px solid var(--professor-dashboard-border-color);
+    background-color: var(--professor-dashboard-active-filter-bg-color);
+    border-radius: 30px;
+    padding: .2rem .5rem .3rem;
+    margin-right: .5rem;
+}
+
+/* Main Table CSS */
+.professorDashboard_table {
+    display: grid;
+    border: 1px solid var(--professor-dashboard-border-color);
+    background-color: var(--professor-dashboard-table-bg-color);
+    margin-top: 1.5rem;
+}
+
+.professorDashboard_table > * {
+    width: 100%;
+    padding: .8rem .5rem;
+}
+
+.professorDashboard_table .header {
+    border: none;
+    background-color: inherit;
+    border-bottom: 1px solid lightgrey;
+
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 1rem;
+}
+
+.professorDashboard_checkboxLabel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.professorDashboard_table .professorDashboard_flexBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+/* Student Table */
+.professorDashboard_table.studentTable {
+    font-size: .9rem;
+    grid-template-columns:  0.2fr minmax(max-content, 1fr) minmax(max-content, .7fr) .7fr minmax(min-content, .6fr) repeat(3, .5fr);
+}
+
+.professorDashboard_studentEmail {
+    font-size: .8rem;
+}
+
+.professorDashboard_studentProject {
+    overflow: hidden;
+}
+
+.professorDashboard_studentProject > div {
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.professorDashboard_delBtn {
+    padding: .5rem;
+    color: var(--professor-dashboard-del-btn-color);
+    background-color: var(--professor-dashboard-del-btn-bg-color);
+}
+
+.professorDashboard_delBtn:hover {
+    color: var(--professor-dashboard-del-btn-bg-color);
+    background-color: var(--professor-dashboard-del-btn-color);
+}
+
+/* Project Table */
+.professorDashboard_table.projectTable {
+    grid-template-columns:  0.1fr minmax(200px, 1fr) minmax(max-content, .4fr) minmax(170px, 1fr) minmax(max-content, .7fr) .4fr;
+}
+
+.professorDashboard_professorsContainer {
+    padding-top: 0.2rem;
+    font-size: .9rem;
+}
+
+.professorDashboard_editBtn {
+    padding: inherit .8rem;
+    color: var(--professor-dashboard-edit-btn-color);
+    background-color: inherit;
+    border: 1px solid;
+}
+
+.professorDashboard_editBtn:hover {
+    color: var(--professor-dashboard-edit-btn-bg-color);
+    background-color: var(--professor-dashboard-edit-btn-color);
+}
+
+.professorDashboard_editProjectBtnContainer {
+    position: relative;
+}
