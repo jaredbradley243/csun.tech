@@ -7,11 +7,12 @@ from django.core.mail import send_mail
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CustomUser, UserProfile, StudentProfile
+from .models import CustomUser, UserProfile, StudentProfile, ProfessorProfile
 from .serializers import (
     CustomUserSerializer,
     UserProfileSerializer,
     StudentProfileSerializer,
+    ProfessorProfileSerializer,
 )
 
 
@@ -41,6 +42,11 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except ValidationError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfessorProfileViewSet(viewsets.ModelViewSet):
+    queryset = ProfessorProfile.objects.all()
+    serializer_class = ProfessorProfileSerializer
 
 
 def index(request):
