@@ -30,6 +30,7 @@ from accounts.views import (
     CustomUserViewSet,
     UserProfileViewSet,
     StudentProfileViewSet,
+    ProfessorProfileViewSet,
 )
 from projects.views import ProjectsViewSet
 
@@ -49,6 +50,7 @@ router = DefaultRouter()
 router.register(r"users", CustomUserViewSet)
 router.register(r"userprofiles", UserProfileViewSet)
 router.register(r"studentprofiles", StudentProfileViewSet)
+router.register(r"professorprofiles", ProfessorProfileViewSet)
 router.register(r"projects", ProjectsViewSet)
 urlpatterns = [
     path("", include(router.urls)),
