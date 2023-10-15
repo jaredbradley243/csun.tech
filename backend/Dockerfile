@@ -10,9 +10,9 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /backend
 
 # Install dependencies
+RUN apt-get update && apt-get install -y git
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
-RUN apt-get update && apt-get install -y git
 
 # Copy project
 COPY . .
