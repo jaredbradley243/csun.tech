@@ -73,7 +73,7 @@ class StudentProfileSerializer(UserProfileSerializer):
             user_profile = StudentProfile.objects.create(user=user, **validated_data)
         else:
             user.delete()
-            raise serializers.ValidationError("Invalid email address")
+            raise serializers.ValidationError("Email address must be CSUN email")
         return user_profile
 
 
@@ -82,6 +82,7 @@ class TeamLeadProfileSerializer(StudentProfileSerializer):
         model = TeamLeadProfile
 
 
+# TODO - Finish Professor Profile
 class ProfessorProfileSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
 
