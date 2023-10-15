@@ -28,7 +28,7 @@
       "settings": {
         "python.analysis.extraPaths": ["./"],
         "editor.fontFamily": "Fira Code",
-        "editor.fontLigatures": true,
+        // "editor.fontLigatures": true,
         "editor.fontLigatures": "'ss08'",
         "disableLigatures.mode": "Cursor",
         "workbench.iconTheme": "vscode-great-icons",
