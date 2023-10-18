@@ -6,6 +6,8 @@ from accounts.serializers import (
     UserProfileSerializer,
 )
 
+from datetime import datetime
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     professors = ProfessorProfileSerializer(many=True, read_only=True)
