@@ -12,6 +12,18 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = "__all__"
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "last_login": {"write_only": True},
+            "is_superuser": {"write_only": True},
+            "date_joined": {"write_only": True},
+            "email": {"write_only": True},
+            "is_staff": {"write_only": True},
+            "email_confirmed": {"write_only": True},
+            "is_active": {"write_only": True},
+            "groups": {"write_only": True},
+            "user_permissions": {"write_only": True},
+        }
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
