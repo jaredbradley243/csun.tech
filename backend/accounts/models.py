@@ -65,6 +65,8 @@ class CustomUser(AbstractUser):
     for user authentication and roles.
     """
 
+    # TODO - Consider using uuid for user IDs rather than sequential numbers
+
     email = models.EmailField(unique=True, blank=False)
     username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=False, verbose_name="first name")
