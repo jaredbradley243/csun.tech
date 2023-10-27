@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models
+import uuid
 from django.core.validators import (
     FileExtensionValidator,
     MinLengthValidator,
@@ -12,7 +13,7 @@ from django.core.validators import (
 )
 from django.core.exceptions import ValidationError
 
-# from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import PermissionDenied
 from csuntech.settings import AUTH_USER_MODEL
 from projects.models import Project
 
@@ -37,7 +38,35 @@ class CustomUserManager(BaseUserManager):
         if not email.endswith(("@csun.edu", "@my.csun.edu")):
             raise ValidationError("Please Enter A CSUN email address")
 
-        user = self.model(email=email, **extra_fields)
+        """" Get Name From Email """
+        full_name = email.split("@")[0]
+        if not full_name:
+            raise ValidationError("Email must contain @")
+
+        name_parts = full_name.split(".")
+        if len(name_parts) < 2:
+            raise ValidationError(
+                "Email should have first name and last name separated by a period"
+            )
+
+        # * Get First Name From name_parts
+        first_name = name_parts[0]
+        if not first_name:
+            raise ValidationError("First name must be present in email")
+        first_name = first_name.replace("-", " ").capitalize()
+        # if not first_name:
+        #     raise ValidationError("First name must be present in email")
+
+        # * Get Last Name From name_parts
+        last_name = name_parts[1]
+        if not last_name:
+            raise ValidationError("Last name must be present in email")
+
+        last_name = last_name.replace("-", " ").capitalize()
+
+        user = self.model(
+            email=email, first_name=first_name, last_name=last_name, **extra_fields
+        )
 
         user.set_password(password)
         user.save()
@@ -65,12 +94,12 @@ class CustomUser(AbstractUser):
     for user authentication and roles.
     """
 
-    # TODO - Consider using uuid for user IDs rather than sequential numbers
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #! Added blank=False to email
     email = models.EmailField(unique=True, blank=False)
     username = models.CharField(max_length=150, unique=True, default="")
-    first_name = models.CharField(max_length=30, blank=False, verbose_name="first name")
-    last_name = models.CharField(max_length=30, blank=False, verbose_name="last name")
+    first_name = models.CharField(max_length=30, blank=True, verbose_name="first name")
+    last_name = models.CharField(max_length=30, blank=True, verbose_name="last name")
     is_staff = models.BooleanField(default=False, verbose_name="staff")
     email_confirmed = models.BooleanField(default=False, verbose_name="email confirmed")
     is_active = models.BooleanField(default=True, verbose_name="active")
@@ -89,36 +118,17 @@ class CustomUser(AbstractUser):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-    def save(self, *args, **kwargs):
-        if not self.username:
-            self.username = self.email
-        super().save(*args, **kwargs)
-
-
-# Todo: Modify UserProfile to include student id for creating StudentProfile
-class UserProfile(models.Model):
-    """
-    UserProfile model stores additional user information not related to
-    authentication or user roles.
-    """
-
-    user = models.OneToOneField(
-        AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
-    )
-    bio = models.TextField(null=True, blank=True)
-    # Todo: Implement Photo
+    @property
+    def is_professor(self):
+        return self.email.endswith("@csun.edu")
 
     @property
     def is_student(self):
-        return self.user.email.endswith("@my.csun.edu")
+        return self.email.endswith("@my.csun.edu")
 
     @property
     def is_team_lead(self):
         return self.is_student and self.team_lead
-
-    @property
-    def is_professor(self):
-        return self.user.email.endswith("@csun.edu")
 
     @property
     def get_role(self):
@@ -131,11 +141,19 @@ class UserProfile(models.Model):
         else:
             return "unknown"
 
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email
+        super().save(*args, **kwargs)
 
-# TODO: Modify StudentProfile to include 492 vs 493
-class StudentProfile(UserProfile):
+
+class StudentProfile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
     team_lead = models.BooleanField(default=False, blank=True)
     is_volunteer = models.BooleanField(default=False, verbose_name="volunteer")
+    #! Added blank=False to email
     student_id = models.CharField(
         unique=True,
         max_length=9,
@@ -144,6 +162,7 @@ class StudentProfile(UserProfile):
         verbose_name="Student ID",
         null=False,
     )
+
     resume = models.FileField(
         upload_to="resumes/",
         validators=[FileExtensionValidator(["pdf"])],
@@ -161,12 +180,12 @@ class StudentProfile(UserProfile):
 
     def join_project(self, project):
         if self.project:
-            raise ValidationError("You're already enrolled in a project")
+            raise ValidationError("Student is already enrolled in a project")
         project.add_student(self)
 
     def leave_project(self):
         if not self.project:
-            raise ValidationError("You're not enrolled in a project")
+            raise ValidationError("Student is not enrolled in a project")
         self.project.remove_student(self)
 
 
@@ -185,14 +204,33 @@ class TeamLeadProfile(StudentProfile):
         self.project.remove_student(student, self)
 
 
-class ProfessorProfile(UserProfile):
-    rate_my_professor_link = models.URLField(blank=True, null=True)
-    csun_faculty_page_link = models.URLField(blank=True, null=True)
+class ProfessorProfile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    rate_my_professor_rating = models.FloatField(
+        blank=True,
+        null=True,
+    )
+    rate_my_professor_difficulty = models.FloatField(
+        blank=True,
+        null=True,
+    )
+
+    rate_my_professor_would_take_again = models.FloatField(
+        blank=True,
+        null=True,
+    )
+
+    csun_faculty_page_link = models.URLField(
+        blank=True,
+        null=True,
+    )
     projects = models.ManyToManyField(
         "projects.Project",
         related_name="professors",
         blank=True,
     )
+    bio = models.TextField(blank=True)
 
     def get_projects(self):
         return self.projects.all()
@@ -243,26 +281,30 @@ class ProfessorProfile(UserProfile):
     def add_student_to_project(self, student, project):
         if project not in self.get_projects():
             raise ValidationError("Project not found in professor's projects")
+
         if student.project:
             raise ValidationError("Selected student is already enrolled in a project")
+
         project.add_student(student, self)
 
     def remove_student_from_project(self, student, project):
         if project not in self.get_projects():
             raise ValidationError("Project not found in professor's projects")
+
         if student.project != project:
             raise ValidationError(
                 "Selected student is not enrolled in the selected project"
             )
+
         project.remove_student(student, self)
 
 
-# Todo: Modify receiver to include student id when creating StudentProfile
-# This signal receiver creates a UserProfile instance when a new CustomUser is created.
-@receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        if instance.email.endswith("@csun.edu"):
-            ProfessorProfile.objects.create(user=instance)
-        elif instance.email.endswith("@my.csun.edu"):
-            StudentProfile.objects.create(user=instance)
+@receiver(post_save, sender=ProfessorProfile)
+def set_default_csun_faculty_page_link(sender, instance, **kwargs):
+    if not instance.csun_faculty_page_link:
+        instance.csun_faculty_page_link = (
+            "https://academics.csun.edu/faculty/"
+            + f"{instance.user.first_name.lower()}"
+            + f".{instance.user.last_name.lower()}/"
+        )
+        instance.save()

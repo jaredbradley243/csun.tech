@@ -28,9 +28,9 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from accounts.views import (
     CustomUserViewSet,
-    UserProfileViewSet,
     StudentProfileViewSet,
     ProfessorProfileViewSet,
+    ProfessorDashboardViewSet,
 )
 from projects.views import ProjectsViewSet
 
@@ -48,11 +48,26 @@ from projects.views import ProjectsViewSet
 
 router = DefaultRouter()
 router.register(r"users", CustomUserViewSet)
-router.register(r"userprofiles", UserProfileViewSet)
 router.register(r"studentprofiles", StudentProfileViewSet)
 router.register(r"professorprofiles", ProfessorProfileViewSet)
 router.register(r"projects", ProjectsViewSet)
+router.register(
+    r"professordashboard", ProfessorDashboardViewSet, basename="professordashboard"
+)
 urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
+    #! Added This
+    path(
+        "professordashboard/<str:professor_id>/",
+        ProfessorDashboardViewSet.as_view({"get": "list"}),
+        name="professor-dashboard",
+    ),
 ]
+
+# TODO - Create email verification endpoint to send users when
+# they click link in verification email
+
+# TODO - Create login endpoint for users to login
+# 1) Check for email_confirmed value of True
+# 2) Check for JWT token

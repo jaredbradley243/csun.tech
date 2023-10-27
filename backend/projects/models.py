@@ -23,6 +23,14 @@ class Project(models.Model):
             raise PermissionDenied("Only Team Leads or Professors can add students")
         if authority and authority.is_team_lead and authority.project != self:
             raise PermissionDenied("Team Lead can only add students to their project")
+        if (
+            authority
+            and authority.is_professor
+            and self not in authority.get_projects()
+        ):
+            raise PermissionDenied(
+                "Professor can only add students to their own projects"
+            )
         if student.project:
             raise ValidationError("Selected student is already enrolled in a project")
         if self.open_slots <= 0:

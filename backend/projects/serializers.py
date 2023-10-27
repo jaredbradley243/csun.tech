@@ -3,14 +3,17 @@ from .models import Project
 from accounts.serializers import (
     ProfessorProfileSerializer,
     CustomUserSerializer,
-    UserProfileSerializer,
+    CustomProfessorProfileSerializer,
 )
 
 from datetime import datetime
 
 
+# TODO - Add email validations
+# 1) Create verification token
+# 2) Send email to user with verification token
 class ProjectSerializer(serializers.ModelSerializer):
-    professors = ProfessorProfileSerializer(many=True, read_only=True)
+    professors = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Project
@@ -78,3 +81,12 @@ class ProjectSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+
+#! Added This
+class CustomProjectSerializer(serializers.ModelSerializer):
+    professors = CustomProfessorProfileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = "__all__"  # Or list the fields you want to include
