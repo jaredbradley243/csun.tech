@@ -57,7 +57,6 @@ router.register(
 urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
-    #! Added This
     path(
         "professordashboard/<str:professor_id>/",
         ProfessorDashboardViewSet.as_view({"get": "list"}),

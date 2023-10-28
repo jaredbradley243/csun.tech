@@ -167,7 +167,6 @@ class ProfessorProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#! Added This
 class ProfessorDashboardViewSet(viewsets.ViewSet):
     def list(self, request, professor_id=None):
         professor = get_object_or_404(ProfessorProfile, id=professor_id)

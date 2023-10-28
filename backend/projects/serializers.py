@@ -88,14 +88,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
 
-#! Added This
 class CustomProjectSerializer(serializers.ModelSerializer):
     professors = CustomProfessorProfileSerializer(many=True, read_only=True)
     project_id = serializers.IntegerField(source="id", read_only=True)
 
     class Meta:
         model = Project
-        # fields = "__all__"
         fields = [
             "project_id",
             "project_name",
