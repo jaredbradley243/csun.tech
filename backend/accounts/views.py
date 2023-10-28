@@ -19,7 +19,7 @@ from .serializers import (
     CustomStudentProfileSerializer,
 )
 from django.shortcuts import get_object_or_404
-from projects.serializers import ProjectSerializer, CustomProjectSerializer
+from projects.serializers import CustomProjectSerializer
 
 
 # TODO - Protect endpoints from non-authenticated and non-authorized users
@@ -93,7 +93,7 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
             return Response(
                 "Student profile not found", status=status.HTTP_404_NOT_FOUND
             )
-        project_id = request.data.get("project_id")
+        project_id = request.data.get("project")
         if project_id is None:
             return Response("Missing project_id", status=status.HTTP_400_BAD_REQUEST)
         try:

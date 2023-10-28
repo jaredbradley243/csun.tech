@@ -171,10 +171,10 @@ class CustomStudentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = [
-            "id",
             "first_name",
             "last_name",
             "email",
+            "id",
             "team_lead",
             "is_volunteer",
             "student_id",
@@ -193,10 +193,10 @@ class CustomProfessorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessorProfile
         fields = [
-            "id",
             "first_name",
             "last_name",
             "email",
+            "id",
             "rate_my_professor_rating",
             "rate_my_professor_difficulty",
             "rate_my_professor_would_take_again",
