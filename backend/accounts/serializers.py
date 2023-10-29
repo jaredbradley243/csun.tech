@@ -7,8 +7,8 @@ from .models import (
     TeamLeadProfile,
     ProfessorProfile,
 )
-import ratemyprofessor
 import logging
+from googlesearch import search
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -87,51 +87,23 @@ class ProfessorProfileSerializer(serializers.ModelSerializer):
             "user": {"read_only": True},
         }
 
-    def fetch_and_update_rmp_data(self, professor_object):
+    # * Included in the serializer so RMP link will resolve before API response is sent
+    def set_default_RMP_link(self, professor_object):
         try:
-            school = ratemyprofessor.get_school_by_name(
-                "California State University Northridge"
-            )
-            rmp_professor = ratemyprofessor.get_professor_by_school_and_name(
-                school,
-                f"{professor_object.user.first_name} {professor_object.user.last_name}",
-            )
-            if rmp_professor is None:
-                raise ValidationError("Professor not found on RMP")
-            prof_rating = rmp_professor.rating
-            if not prof_rating:
-                raise ValidationError("Professor has no rating or rating not found")
-            prof_would_take_again = rmp_professor.would_take_again
-            if not prof_would_take_again:
-                raise ValidationError(
-                    "Professor has no would take again rating or rating not found"
+            RMP_link = list(
+                search(
+                    f"{professor_object.user.first_name} "
+                    + f" {professor_object.user.last_name}"
+                    + " Rate My professor California State University - Northridge",
+                    num_results=1,
                 )
-            prof_difficulty = rmp_professor.difficulty
-            if not prof_difficulty:
-                raise ValidationError(
-                    "Professor has no difficulty rating or difficulty rating not found"
-                )
-            changes_made = False
+            )[0]
 
-            if prof_rating is not None:
-                professor_object.rate_my_professor_rating = prof_rating
-                changes_made = True
-            if prof_would_take_again is not None:
-                professor_object.rate_my_professor_would_take_again = (
-                    prof_would_take_again
-                )
-                changes_made = True
-            if prof_difficulty is not None:
-                professor_object.rate_my_professor_difficulty = prof_difficulty
-                changes_made = True
-
-            if changes_made:
-                professor_object.save()
+            professor_object.rate_my_professor_link = RMP_link
+            professor_object.save()
 
         except Exception as e:
-            logging.error(
-                f"An error occurred while updating RMP data: {str(e)}"
-            )  # For debugging purposes
+            logging.error(f"An error occurred while updating RMP link: {str(e)}")
 
     def create(self, validated_data):
         email = validated_data.get("email")
@@ -157,12 +129,12 @@ class ProfessorProfileSerializer(serializers.ModelSerializer):
             if user:
                 user.delete()
             raise serializers.ValidationError(str(e))
-        self.fetch_and_update_rmp_data(professor_profile)
+
+        self.set_default_RMP_link(professor_profile)
 
         return professor_profile
 
 
-#! Added This
 class CustomStudentProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source="user.first_name")
     last_name = serializers.CharField(source="user.last_name")
@@ -184,7 +156,6 @@ class CustomStudentProfileSerializer(serializers.ModelSerializer):
         ]
 
 
-#! Added This
 class CustomProfessorProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source="user.first_name")
     last_name = serializers.CharField(source="user.last_name")
@@ -197,12 +168,9 @@ class CustomProfessorProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "id",
-            "rate_my_professor_rating",
-            "rate_my_professor_difficulty",
-            "rate_my_professor_would_take_again",
+            "rate_my_professor_link",
             "csun_faculty_page_link",
             "bio",
             "user",
             "projects",
-            # add other fields as needed
         ]

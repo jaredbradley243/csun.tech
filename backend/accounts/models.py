@@ -95,7 +95,6 @@ class CustomUser(AbstractUser):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    #! Added blank=False to email
     email = models.EmailField(unique=True, blank=False)
     username = models.CharField(max_length=150, unique=True, default="")
     first_name = models.CharField(max_length=30, blank=True, verbose_name="first name")
@@ -153,7 +152,6 @@ class StudentProfile(models.Model):
 
     team_lead = models.BooleanField(default=False, blank=True)
     is_volunteer = models.BooleanField(default=False, verbose_name="volunteer")
-    #! Added blank=False to email
     student_id = models.CharField(
         unique=True,
         max_length=9,
@@ -207,20 +205,10 @@ class TeamLeadProfile(StudentProfile):
 class ProfessorProfile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    rate_my_professor_rating = models.FloatField(
+    rate_my_professor_link = models.URLField(
         blank=True,
         null=True,
     )
-    rate_my_professor_difficulty = models.FloatField(
-        blank=True,
-        null=True,
-    )
-
-    rate_my_professor_would_take_again = models.FloatField(
-        blank=True,
-        null=True,
-    )
-
     csun_faculty_page_link = models.URLField(
         blank=True,
         null=True,
