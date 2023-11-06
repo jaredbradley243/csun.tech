@@ -31,6 +31,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         }
 
 
+#! Student profile always created with team lead false, even if specified otherwise
 class StudentProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True, help_text="Required")
     password = serializers.CharField(write_only=True, help_text="Required")
@@ -71,9 +72,10 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         return student_profile
 
 
-class TeamLeadProfileSerializer(StudentProfileSerializer):
-    class Meta(StudentProfileSerializer.Meta):
+class TeamLeadProfileSerializer(serializers.ModelSerializer):
+    class Meta:
         model = TeamLeadProfile
+        fields = "__all__"
 
 
 class ProfessorProfileSerializer(serializers.ModelSerializer):
@@ -92,14 +94,16 @@ class ProfessorProfileSerializer(serializers.ModelSerializer):
         try:
             RMP_link = list(
                 search(
-                    f"{professor_object.user.first_name} "
-                    + f" {professor_object.user.last_name}"
+                    f"{professor_object.user.full_name}"
                     + " Rate My professor California State University - Northridge",
                     num_results=1,
                 )
             )[0]
 
-            professor_object.rate_my_professor_link = RMP_link
+            if RMP_link.find("ratemyprofessors") != -1:
+                professor_object.rate_my_professor_link = RMP_link
+            else:
+                professor_object.rate_my_professor_link = None
             professor_object.save()
 
         except Exception as e:

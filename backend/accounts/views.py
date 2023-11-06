@@ -7,16 +7,17 @@ from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from rest_framework.exceptions import MethodNotAllowed
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CustomUser, StudentProfile, ProfessorProfile
+from .models import CustomUser, StudentProfile, ProfessorProfile, TeamLeadProfile
 from projects.models import Project
 from .serializers import (
     CustomUserSerializer,
     StudentProfileSerializer,
     ProfessorProfileSerializer,
     CustomStudentProfileSerializer,
+    TeamLeadProfileSerializer,
 )
 from django.shortcuts import get_object_or_404
 from projects.serializers import CustomProjectSerializer
@@ -129,6 +130,36 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
 
         serializer = StudentProfileSerializer(student_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TeamLeadProfileViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    queryset = TeamLeadProfile.objects.filter(team_lead=True)
+    serializer_class = TeamLeadProfileSerializer
+
+    # TODO - Add error handling
+    @action(detail=True, methods=["post"])
+    def add_student_to_project(self, request, pk=None):
+        teamleadprofile_id = pk
+        studentprofile_id = request.data.get("studentprofile_id")
+        studentprofile = get_object_or_404(StudentProfile, id=studentprofile_id)
+        teamleadprofile = get_object_or_404(TeamLeadProfile, id=teamleadprofile_id)
+
+        teamleadprofile.add_student_to_project(studentprofile)
+        # your logic to add a student to a project
+        return Response({"status": "student added to project"})
+
+    # TODO - Add error handling
+    @action(detail=True, methods=["post"])
+    def remove_student_from_project(self, request, pk=None):
+        teamleadprofile_id = pk
+        studentprofile_id = request.data.get("studentprofile_id")
+        studentprofile = get_object_or_404(StudentProfile, id=studentprofile_id)
+        teamleadprofile = get_object_or_404(TeamLeadProfile, id=teamleadprofile_id)
+
+        teamleadprofile.remove_student_from_project(studentprofile)
+        return Response({"status": "student removed from project"})
 
 
 class ProfessorProfileViewSet(viewsets.ModelViewSet):

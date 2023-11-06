@@ -118,18 +118,6 @@ class CustomUser(AbstractUser):
         return f"{self.first_name} {self.last_name}"
 
     @property
-    def is_professor(self):
-        return self.email.endswith("@csun.edu")
-
-    @property
-    def is_student(self):
-        return self.email.endswith("@my.csun.edu")
-
-    @property
-    def is_team_lead(self):
-        return self.is_student and self.team_lead
-
-    @property
     def get_role(self):
         if self.is_professor:
             return "professor"
@@ -186,6 +174,18 @@ class StudentProfile(models.Model):
             raise ValidationError("Student is not enrolled in a project")
         self.project.remove_student(self)
 
+    @property
+    def is_student(self):
+        return self.user.email.endswith("@my.csun.edu")
+
+    @property
+    def is_team_lead(self):
+        return self.is_student and self.team_lead
+
+    @property
+    def is_professor(self):
+        return self.user.email.endswith("@csun.edu")
+
 
 class TeamLeadProfile(StudentProfile):
     class Meta:
@@ -193,12 +193,12 @@ class TeamLeadProfile(StudentProfile):
 
     def add_student_to_project(self, student):
         if not self.project:
-            raise ValidationError("User is not enrolled in a project")
+            raise ValidationError("Team lead is not enrolled in a project")
         self.project.add_student(student, self)
 
     def remove_student_from_project(self, student):
         if not self.project:
-            raise ValidationError("User is not enrolled in a project")
+            raise ValidationError("Team lead is not enrolled in a project")
         self.project.remove_student(student, self)
 
 

@@ -61,6 +61,7 @@ class Project(models.Model):
         self.validate_open_slots()
         super().save(*args, **kwargs)
 
+    # TODO - Implement validation that disallows start_time from being after end_time
     def validate_meeting_schedule(self):
         if self.meeting_schedule is not None:
             valid_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]

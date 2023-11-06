@@ -18,12 +18,23 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = "__all__"
+        fields = [
+            "id",
+            "project_name",
+            "project_description",
+            "open_slots",
+            "capacity",
+            "relevant_skills",
+            "meeting_schedule",
+            "professors",
+        ]
         extra_kwargs = {
             "project_name": {"help_text": "Required"},
             "open_slots": {"help_text": "Required"},
             "capacity": {"help_text": "Required"},
         }
 
+    # TODO - Remove validate_meeting_schedule from serializer or model
     def validate_meeting_schedule(self, meeting_schedule_list):
         if meeting_schedule_list is None or len(meeting_schedule_list) == 0:
             return []

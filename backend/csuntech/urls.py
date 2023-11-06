@@ -16,6 +16,7 @@ from accounts.views import (
     StudentProfileViewSet,
     ProfessorProfileViewSet,
     ProfessorDashboardViewSet,
+    TeamLeadProfileViewSet,
 )
 from projects.views import ProjectsViewSet
 
@@ -34,6 +35,7 @@ from projects.views import ProjectsViewSet
 router = DefaultRouter()
 router.register(r"users", CustomUserViewSet)
 router.register(r"studentprofiles", StudentProfileViewSet)
+router.register(r"teamleadprofiles", TeamLeadProfileViewSet)
 router.register(r"professorprofiles", ProfessorProfileViewSet)
 router.register(r"projects", ProjectsViewSet)
 router.register(
