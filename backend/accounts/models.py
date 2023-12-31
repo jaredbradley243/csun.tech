@@ -128,6 +128,19 @@ class CustomUser(AbstractUser):
         else:
             return "unknown"
 
+    @property
+    def is_student(self):
+        return self.email.endswith("@my.csun.edu")
+
+    @property
+    def is_team_lead(self):
+        if hasattr(self, "studentprofile"):
+            return self.studentprofile.team_lead
+
+    @property
+    def is_professor(self):
+        return self.email.endswith("@csun.edu")
+
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.email
@@ -174,18 +187,6 @@ class StudentProfile(models.Model):
             raise ValidationError("Student is not enrolled in a project")
         self.project.remove_student(self)
 
-    @property
-    def is_student(self):
-        return self.user.email.endswith("@my.csun.edu")
-
-    @property
-    def is_team_lead(self):
-        return self.is_student and self.team_lead
-
-    @property
-    def is_professor(self):
-        return self.user.email.endswith("@csun.edu")
-
 
 class TeamLeadProfile(StudentProfile):
     class Meta:
@@ -205,10 +206,6 @@ class TeamLeadProfile(StudentProfile):
 class ProfessorProfile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    rate_my_professor_link = models.URLField(
-        blank=True,
-        null=True,
-    )
     csun_faculty_page_link = models.URLField(
         blank=True,
         null=True,
