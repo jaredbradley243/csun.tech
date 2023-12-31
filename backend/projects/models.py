@@ -61,49 +61,49 @@ class Project(models.Model):
         self.validate_open_slots()
         super().save(*args, **kwargs)
 
-    # TODO - Implement validation that disallows start_time from being after end_time
-    def validate_meeting_schedule(self):
-        if self.meeting_schedule is not None:
-            valid_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-            if not isinstance(self.meeting_schedule, list):
-                raise ValidationError("meeting_schedule should be a list")
+    # # TODO - Implement validation that disallows start_time from being after end_time
+    # def validate_meeting_schedule(self):
+    #     if self.meeting_schedule is not None:
+    #         valid_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    #         if not isinstance(self.meeting_schedule, list):
+    #             raise ValidationError("meeting_schedule should be a list")
 
-            for meeting_dict in self.meeting_schedule:
-                if not isinstance(meeting_dict, dict):
-                    raise ValidationError(
-                        "Each item in meeting_schedule should be a dictionary"
-                    )
+    #         for meeting_dict in self.meeting_schedule:
+    #             if not isinstance(meeting_dict, dict):
+    #                 raise ValidationError(
+    #                     "Each item in meeting_schedule should be a dictionary"
+    #                 )
 
-                required_keys = ["day", "start_time", "end_time"]
-                for key in required_keys:
-                    if key not in meeting_dict:
-                        raise ValidationError(
-                            f"{key} is required in each meeting dictionary"
-                        )
+    #             required_keys = ["day", "start_time", "end_time"]
+    #             for key in required_keys:
+    #                 if key not in meeting_dict:
+    #                     raise ValidationError(
+    #                         f"{key} is required in each meeting dictionary"
+    #                     )
 
-                time_format = "%H:%M"  # 24-hour format
-                for time_key in ["start_time", "end_time"]:
-                    try:
-                        time_obj = datetime.strptime(
-                            meeting_dict[time_key], time_format
-                        )
-                        meeting_dict[time_key] = datetime.strftime(
-                            time_obj, time_format
-                        )
-                    except ValueError:
-                        raise ValidationError(
-                            f"{time_key} should be in {time_format} format"
-                        )
+    #             time_format = "%H:%M"  # 24-hour format
+    #             for time_key in ["start_time", "end_time"]:
+    #                 try:
+    #                     time_obj = datetime.strptime(
+    #                         meeting_dict[time_key], time_format
+    #                     )
+    #                     meeting_dict[time_key] = datetime.strftime(
+    #                         time_obj, time_format
+    #                     )
+    #                 except ValueError:
+    #                     raise ValidationError(
+    #                         f"{time_key} should be in {time_format} format"
+    #                     )
 
-                normalized_day = meeting_dict["day"].title()
-                if normalized_day not in valid_days:
-                    raise ValidationError(
-                        "day must be one of the valid days: {}".format(
-                            ", ".join(valid_days)
-                        )
-                    )
-                meeting_dict["day"] = normalized_day
+    #             normalized_day = meeting_dict["day"].title()
+    #             if normalized_day not in valid_days:
+    #                 raise ValidationError(
+    #                     "day must be one of the valid days: {}".format(
+    #                         ", ".join(valid_days)
+    #                     )
+    #                 )
+    #             meeting_dict["day"] = normalized_day
 
-    def validate_open_slots(self):
-        if self.open_slots > self.capacity:
-            raise ValidationError("Open slots cannot exceed capacity")
+    # def validate_open_slots(self):
+    #     if self.open_slots > self.capacity:
+    #         raise ValidationError("Open slots cannot exceed capacity")
