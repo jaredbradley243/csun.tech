@@ -11,12 +11,14 @@ from accounts import views as accounts_views
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from accounts.views import (
     CustomUserViewSet,
-    StudentProfileViewSet,
-    ProfessorProfileViewSet,
-    ProfessorDashboardViewSet,
-    TeamLeadProfileViewSet,
+    #     # StudentProfileViewSet,
+    #     # ProfessorProfileViewSet,
+    #     # ProfessorDashboardViewSet,
+    #     # TeamLeadProfileViewSet,
+    #     # RegisterViewSet,
 )
 from projects.views import ProjectsViewSet
 
@@ -34,21 +36,23 @@ from projects.views import ProjectsViewSet
 
 router = DefaultRouter()
 router.register(r"users", CustomUserViewSet)
-router.register(r"studentprofiles", StudentProfileViewSet)
-router.register(r"teamleadprofiles", TeamLeadProfileViewSet)
-router.register(r"professorprofiles", ProfessorProfileViewSet)
+# router.register(r"students", StudentProfileViewSet)
+# router.register(r"teamleads", TeamLeadProfileViewSet)
+# router.register(r"professors", ProfessorProfileViewSet)
 router.register(r"projects", ProjectsViewSet)
-router.register(
-    r"professordashboard", ProfessorDashboardViewSet, basename="professordashboard"
-)
+# router.register(
+#     r"professordashboard", ProfessorDashboardViewSet, basename="professordashboard"
+# )
+# router.register(r"register", RegisterViewSet, basename="register")
+
 urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
-    path(
-        "professordashboard/<str:professor_id>/",
-        ProfessorDashboardViewSet.as_view({"get": "list"}),
-        name="professor-dashboard",
-    ),
+    # path(
+    #     "professordashboard/<str:professor_id>/",
+    #     ProfessorDashboardViewSet.as_view({"get": "list"}),
+    #     name="professor-dashboard",
+    # ),
 ]
 
 # TODO - Create email verification endpoint to send users when
