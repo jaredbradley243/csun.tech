@@ -1,12 +1,16 @@
+from uuid import UUID
 from email.message import EmailMessage
 from django.forms import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db import transaction
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Project
 from .serializers import ProjectListSerializer, ProjectDetailSerializer
 from django.shortcuts import get_object_or_404
@@ -20,68 +24,138 @@ from accounts.models import (
 
 class ProjectsViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
-    # serializer_class = ProjectListSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
         if self.action == "list":
             return ProjectListSerializer
         return ProjectDetailSerializer
 
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_professor:
+            return Response(
+                {"error": "Unauthorized action. Only professors can create projects"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not request.user.is_professor:
+            return Response(
+                {"error": "Unauthorized action. Only professors can update projects"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().create(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        if not request.user.is_professor:
+            return Response(
+                {"error": "Unauthorized action. Only professors can update projects"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().create(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_professor:
+            return Response(
+                {"error": "Unauthorized action. Only professors can delete projects"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().create(request, *args, **kwargs)
+
+    # TODO: Handle student already being enrolled in a project
     # TODO: Handle Team lead and professors adding students to project
+    # TODO: Handle professor inv another prof to join Project
     @action(detail=True, methods=["post"], url_path="students")
+    @transaction.atomic
     def join_project(self, request, pk=None):
-        # TODO: Handle Students Joining Project
         user_id = request.data.get("user_id")
 
-        if not user_id or not isinstance(user_id, str):
+        if not user_id:
             return Response(
                 {"error": "Valid user ID is required"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        try:
+            UUID(user_id, version=4)
+        except ValueError:
+            return Response(
+                {"error": "Invalid user ID format."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user_instance = get_object_or_404(CustomUser, pk=user_id)
-        project = self.get_object()
+        project_instance = self.get_object()
 
-        if user_instance.is_student:
-            user_instance.studentprofile.join_project(project)
+        if user_instance == request.user:
+            if user_instance.studentprofile.project:
+                user_instance.studentprofile.leave_project()
+            user_instance.studentprofile.join_project(project_instance)
+            project_instance.refresh_from_db()
+        else:
+            return Response(
+                {
+                    "error": "Unauthorized action. You cannot add another user to a project."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
-        # 3. Use student object to call "join_project(self, project)" on student profile
-        # 4. Return appropriate response
-
-        # TODO: Handle professor inv another prof to join Project
-        # pass
-
-        # try:
-        #     student_profile = self.get_object()
-        # except Http404:
-        #     return Response(
-        #         "Student profile not found", status=status.HTTP_404_NOT_FOUND
-        #     )
-        # project_id = request.data.get("project")
-        # if project_id is None:
-        #     return Response("Missing project_id", status=status.HTTP_400_BAD_REQUEST)
-        # try:
-        #     project_id = int(project_id)
-        #     if project_id <= 0:
-        #         raise ValueError()
-        # except ValueError:
-        #     return Response("Invalid project_id", status=status.HTTP_400_BAD_REQUEST)
-        # try:
-        #     project = Project.objects.get(pk=project_id)
-        # except ObjectDoesNotExist:
-        #     return Response("Project does not exist", status=status.HTTP_404_NOT_FOUND)
-        # try:
-        #     student_profile.join_project(project)
-        # except ValidationError as e:
-        #     return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-        # serializer = StudentProfileSerializer(student_profile)
-        return Response(status=status.HTTP_200_OK)
+        project_serializer_instance = ProjectDetailSerializer(project_instance)
+        return Response(
+            {
+                "message": "You have successfully joined the project.",
+                "open_slots": project_serializer_instance.data["open_slots"],
+            },
+            status=status.HTTP_200_OK,
+        )
 
     # TODO: Handle Team lead and professors removing students from project
     # TODO: Handle professor removing another prof from Project
-    @action(detail=True, methods=["post"], url_path="students")
-    def leave_project(self, request, pk=None):
-        # TODO: Handle Students leaving Project
+    # TODO: Handle professor leaving Project
+    @action(detail=False, methods=["delete"], url_path="students/<str:user_id>/")
+    @transaction.atomic
+    def leave_project(self, request, user_id):
+        if not user_id:
+            return Response(
+                {"error": "Valid user ID is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        # TODO: Handle professor leaving Project
-        pass
+        try:
+            UUID(user_id, version=4)
+        except ValueError:
+            return Response(
+                {"error": "Invalid user ID format."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user_instance = get_object_or_404(CustomUser, pk=user_id)
+
+        project_instance = user_instance.studentprofile.project
+
+        if not project_instance:
+            return Response(
+                {"error": "User is not associated with any project."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user_instance == request.user:
+            user_instance.studentprofile.leave_project()
+            project_instance.refresh_from_db()
+        else:
+            return Response(
+                {
+                    "error": "Unauthorized action. You cannot remove another user from a project."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        project_serializer_instance = ProjectDetailSerializer(project_instance)
+        return Response(
+            {
+                "message": "You have successfully left the project.",
+                "open_slots": project_serializer_instance.data["open_slots"],
+            },
+            status=status.HTTP_200_OK,
+        )
