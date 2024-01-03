@@ -1,3 +1,4 @@
+from uuid import UUID
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from email.message import EmailMessage
@@ -10,19 +11,25 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CustomUser, StudentProfile, ProfessorProfile, TeamLeadProfile
+from .models import CustomUser, StudentProfile, ProfessorProfile
 from projects.models import Project
 
 from .serializers import (
     CustomUserSerializer,
-    #     # StudentProfileSerializer,
-    #     # ProfessorProfileSerializer,
-    #     # CustomStudentProfileSerializer,
-    #     # TeamLeadProfileSerializer,
+    StudentProfileSerializer,
+    ProfessorProfileSerializer,
+    ProfessorDashboardStudentSerializer,
+    ProfessorNameSerializer,
+    UserProfileStudentSerializer,
+    UserProfileProfessorSerializer,
+)
+
+from projects.serializers import (
+    ProjectDetailSerializer,
+    ProjectListSerializer,
+    ProfessorDashboardProjectSerializer,
 )
 from django.shortcuts import get_object_or_404
-
-# from projects.serializers import CustomProjectSerializer
 
 
 # TODO - Protect endpoints from non-authenticated and non-authorized users
@@ -74,176 +81,264 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class StudentProfileViewSet(viewsets.ModelViewSet):
-#     queryset = StudentProfile.objects.all()
-#     serializer_class = StudentProfileSerializer
+class StudentProfileViewSet(viewsets.ModelViewSet):
+    queryset = StudentProfile.objects.all()
+    serializer_class = StudentProfileSerializer
 
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
 
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     def update(self, request, *args, **kwargs):
-#         instance = self.get_object()
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
 
-#         request_data_id = request.data.get("id", None)
-#         request_data_user = request.data.get("user", None)
-#         if request_data_id and request_data_id != str(instance.id):
-#             return Response(
-#                 "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
-#             )
-#         if request_data_user and request_data_user != str(instance.user.id):
-#             return Response(
-#                 "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
-#             )
+        request_data_id = request.data.get("id", None)
+        request_data_user = request.data.get("user", None)
+        if request_data_id and request_data_id != str(instance.id):
+            return Response(
+                "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
+            )
+        if request_data_user and request_data_user != str(instance.user.id):
+            return Response(
+                "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
+            )
 
-#         serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
 
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     @action(detail=True, methods=["post"])
-#     def join_project(self, request, pk=None):
-#         try:
-#             student_profile = self.get_object()
-#         except Http404:
-#             return Response(
-#                 "Student profile not found", status=status.HTTP_404_NOT_FOUND
-#             )
-#         project_id = request.data.get("project")
-#         if project_id is None:
-#             return Response("Missing project_id", status=status.HTTP_400_BAD_REQUEST)
-#         try:
-#             project_id = int(project_id)
-#             if project_id <= 0:
-#                 raise ValueError()
-#         except ValueError:
-#             return Response("Invalid project_id", status=status.HTTP_400_BAD_REQUEST)
-#         try:
-#             project = Project.objects.get(pk=project_id)
-#         except ObjectDoesNotExist:
-#             return Response("Project does not exist", status=status.HTTP_404_NOT_FOUND)
-#         try:
-#             student_profile.join_project(project)
-#         except ValidationError as e:
-#             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=["post"])
+    def join_project(self, request, pk=None):
+        try:
+            student_profile = self.get_object()
+        except Http404:
+            return Response(
+                "Student profile not found", status=status.HTTP_404_NOT_FOUND
+            )
+        project_id = request.data.get("project")
+        if project_id is None:
+            return Response("Missing project_id", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            project_id = int(project_id)
+            if project_id <= 0:
+                raise ValueError()
+        except ValueError:
+            return Response("Invalid project_id", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            project = Project.objects.get(pk=project_id)
+        except ObjectDoesNotExist:
+            return Response("Project does not exist", status=status.HTTP_404_NOT_FOUND)
+        try:
+            student_profile.join_project(project)
+        except ValidationError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-#         serializer = StudentProfileSerializer(student_profile)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = StudentProfileSerializer(student_profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-#     @action(detail=True, methods=["post"])
-#     def leave_project(self, request, pk=None):
-#         try:
-#             student_profile = self.get_object()
-#         except Http404:
-#             return Response(
-#                 "Student profile not found", status=status.HTTP_404_NOT_FOUND
-#             )
-#         try:
-#             student_profile.leave_project()
-#         except ValidationError as e:
-#             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=["post"])
+    def leave_project(self, request, pk=None):
+        try:
+            student_profile = self.get_object()
+        except Http404:
+            return Response(
+                "Student profile not found", status=status.HTTP_404_NOT_FOUND
+            )
+        try:
+            student_profile.leave_project()
+        except ValidationError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-#         serializer = StudentProfileSerializer(student_profile)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# class TeamLeadProfileViewSet(
-#     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-# ):
-#     queryset = TeamLeadProfile.objects.filter(team_lead=True)
-#     serializer_class = TeamLeadProfileSerializer
-
-#     # TODO - Add error handling
-#     @action(detail=True, methods=["post"])
-#     def add_student_to_project(self, request, pk=None):
-#         teamleadprofile_id = pk
-#         studentprofile_id = request.data.get("studentprofile_id")
-#         studentprofile = get_object_or_404(StudentProfile, id=studentprofile_id)
-#         teamleadprofile = get_object_or_404(TeamLeadProfile, id=teamleadprofile_id)
-
-#         teamleadprofile.add_student_to_project(studentprofile)
-#         # your logic to add a student to a project
-#         return Response({"status": "student added to project"})
-
-#     # TODO - Add error handling
-#     @action(detail=True, methods=["post"])
-#     def remove_student_from_project(self, request, pk=None):
-#         teamleadprofile_id = pk
-#         studentprofile_id = request.data.get("studentprofile_id")
-#         studentprofile = get_object_or_404(StudentProfile, id=studentprofile_id)
-#         teamleadprofile = get_object_or_404(TeamLeadProfile, id=teamleadprofile_id)
-
-#         teamleadprofile.remove_student_from_project(studentprofile)
-#         return Response({"status": "student removed from project"})
+        serializer = StudentProfileSerializer(student_profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# class ProfessorProfileViewSet(viewsets.ModelViewSet):
-#     queryset = ProfessorProfile.objects.all()
-#     serializer_class = ProfessorProfileSerializer
-#     http_method_names = ["get", "put", "patch", "delete", "head", "options", "trace"]
-
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def update(self, request, *args, **kwargs):
-#         instance = self.get_object()
-
-#         request_data_id = request.data.get("id", None)
-#         request_data_user = request.data.get("user", None)
-#         if request_data_id and request_data_id != str(instance.id):
-#             return Response(
-#                 "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
-#             )
-#         if request_data_user and request_data_user != str(instance.user.id):
-#             return Response(
-#                 "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#         serializer = self.get_serializer(instance, data=request.data, partial=True)
-
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ProfessorProfileViewSet(viewsets.ModelViewSet):
+    queryset = ProfessorProfile.objects.all()
+    serializer_class = ProfessorProfileSerializer
+    http_method_names = ["get"]
 
 
-# class ProfessorDashboardViewSet(viewsets.ViewSet):
-#     def list(self, request, professor_id=None):
-#         professor = get_object_or_404(ProfessorProfile, id=professor_id)
-#         projects = professor.projects.all()
-#         students = StudentProfile.objects.filter(project__in=projects).select_related(
-#             "user"
-#         )
+class ProfessorDashboardViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = ProfessorProfile.objects.all()
+    serializer_class = ProfessorProfileSerializer
 
-#         students_data = CustomStudentProfileSerializer(students, many=True).data
-#         projects_data = CustomProjectSerializer(projects, many=True).data
+    def dashboard(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return Response(
+                {
+                    "error": "Unauthorized action. You must be logged in to view the professor dashboard"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if not request.user.is_professor:
+            return Response(
+                {
+                    "error": "Unauthorized action. Only professors can view professor dashboard"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
-#         return Response(
-#             {
-#                 "students": students_data,
-#                 "projects": projects_data,
-#             }
-#         )
+        professor_instance = self.get_object()
+        projects = professor_instance.projects.all()
+        students = StudentProfile.objects.filter(project__in=projects).distinct()
+
+        student_serializer = ProfessorDashboardStudentSerializer(students, many=True)
+        project_serializer = ProfessorDashboardProjectSerializer(projects, many=True)
+
+        return Response(
+            {"students": student_serializer.data, "projects": project_serializer.data},
+            status=status.HTTP_200_OK,
+        )
+
+    def students(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return Response(
+                {
+                    "error": "Unauthorized action. You must be logged in to view the professor dashboard"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if not request.user.is_professor:
+            return Response(
+                {
+                    "error": "Unauthorized action. Only professors can view professor dashboard"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        professor_instance = self.get_object()
+        projects = professor_instance.projects.all()
+        students = StudentProfile.objects.filter(project__in=projects).distinct()
+
+        student_serializer = ProfessorDashboardStudentSerializer(students, many=True)
+
+        return Response(
+            {"students": student_serializer.data}, status=status.HTTP_200_OK
+        )
+
+    def projects(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return Response(
+                {
+                    "error": "Unauthorized action. You must be logged in to view the professor dashboard"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if not request.user.is_professor:
+            return Response(
+                {
+                    "error": "Unauthorized action. Only professors can view professor dashboard"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        professor_instance = self.get_object()
+        projects = professor_instance.projects.all()
+
+        project_serializer = ProfessorDashboardProjectSerializer(projects, many=True)
+
+        return Response(
+            {"projects": project_serializer.data},
+            status=status.HTTP_200_OK,
+        )
 
 
-# def index(request):
-#     return HttpResponse("Hello, world. You're at the index.")
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
 
+    def get_serializer_class(self):
+        if self.action in ["update", "partial_update"]:
+            user_instance = self.get_object()
 
-# def register(request):
-#     return HttpResponse("Hello, world. You're at the register page.")
+            if user_instance.is_student:
+                return UserProfileStudentSerializer
+            elif user_instance.is_professor:
+                return UserProfileProfessorSerializer
+        return CustomUserSerializer
+
+    @action(detail=False, methods=["get"])
+    def retrieve_user_profile(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return Response(
+                {
+                    "error": "Unauthorized action. You must be logged in to view your profile"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        user_instance = request.user
+
+        if user_instance.is_student:
+            student_profile = user_instance.studentprofile
+            serializer = UserProfileStudentSerializer(student_profile)
+        elif user_instance.is_professor:
+            professor_profile = user_instance.professorprofile
+            serializer = UserProfileProfessorSerializer(professor_profile)
+        else:
+            return Response(
+                "User role not recognized", status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return Response(
+                {
+                    "error": "Unauthorized action. You must be logged in to update your profile"
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        user_id = kwargs.get("pk")
+
+        if not user_id:
+            return Response(
+                {"error": "Valid user ID is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user_instance = get_object_or_404(CustomUser, pk=user_id)
+
+        if request.user != user_instance:
+            return Response(
+                {
+                    "error": "Unauthorized action. You cannot update another user's profile."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if "first_name" in request.data or "last_name" in request.data:
+            return Response(
+                {
+                    "First and last name are determined by user's email"
+                    + " address and cannot be updated."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if "email" in request.data:
+            return Response(
+                {"Email addresses cannot be updated."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if "csun_faculty_page_link" in request.data:
+            return Response(
+                {"Faculty links are determined automatically and cannot be updated."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if "projects" in request.data or "project" in request.data:
+            return Response(
+                {"Projects can be updated at the /projects/ endpoint."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().update(request, *args, **kwargs)
