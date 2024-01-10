@@ -1,30 +1,63 @@
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from django.db import IntegrityError, transaction
-from .models import (
-    CustomUser,
-    StudentProfile,
-    ProfessorProfile,
-)
+from .models import CustomUser, StudentProfile, ProfessorProfile, CustomUserManager
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    student_id = serializers.CharField(required=False, write_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = "__all__"
+
+    @transaction.atomic
+    def create(self, validated_data):
+        email = validated_data.get("email")
+        password = validated_data.get("password")
+        if email.endswith("@my.csun.edu"):
+            student_id = validated_data.get("student_id")
+            if not student_id:
+                raise serializers.ValidationError(
+                    "User is a student, but no student ID was given"
+                )
+        try:
+            user = CustomUser.objects.create_user(
+                email=email,
+                password=password,
+            )
+
+            if user.email.endswith("@my.csun.edu"):
+                StudentProfile.objects.create(user=user, student_id=student_id)
+
+            elif user.email.endswith("@csun.edu"):
+                ProfessorProfile.objects.create(user=user)
+
+        except (ValidationError, IntegrityError) as e:
+            raise serializers.ValidationError(str(e))
+
+        return user
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = [
-            "id",
-            "password",
-            "email",
-            "first_name",
-            "last_name",
-            "email_confirmed",
-        ]
-        extra_kwargs = {
-            "password": {"write_only": True},
-            "first_name": {"read_only": True},
-            "last_name": {"read_only": True},
-            "email_confirmed": {"write_only": True},
-        }
+        fields = "__all__"
+        # TODO: Remove fields above and uncomment fields/extra kw below
+        # fields = [
+        #     "id",
+        #     "password",
+        #     "email",
+        #     "first_name",
+        #     "last_name",
+        #     "email_confirmed",
+        # ]
+        # extra_kwargs = {
+        #     "password": {"write_only": True},
+        #     "first_name": {"read_only": True},
+        #     "last_name": {"read_only": True},
+        #     "email_confirmed": {"write_only": True},
+        # }
 
 
 # #! Student profile always created with team lead false, even if specified otherwise
