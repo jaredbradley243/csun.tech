@@ -1,4 +1,8 @@
 from uuid import UUID
+import jwt
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+import datetime
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from email.message import EmailMessage
@@ -13,6 +17,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CustomUser, StudentProfile, ProfessorProfile
 from projects.models import Project
+from django.core.mail import send_mail
+
 
 from .serializers import (
     CustomUserSerializer,
@@ -22,6 +28,7 @@ from .serializers import (
     ProfessorNameSerializer,
     UserProfileStudentSerializer,
     UserProfileProfessorSerializer,
+    RegistrationSerializer,
 )
 
 from projects.serializers import (
@@ -30,6 +37,8 @@ from projects.serializers import (
     ProfessorDashboardProjectSerializer,
 )
 from django.shortcuts import get_object_or_404
+from django.db import transaction, IntegrityError
+from csuntech.settings import SECRET_KEY
 
 
 # TODO - Protect endpoints from non-authenticated and non-authorized users
@@ -37,24 +46,109 @@ from django.shortcuts import get_object_or_404
 
 
 # # TODO - Finish the registration endpoint
-# class RegisterViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
-#     queryset = CustomUser.objects.none()
-#     http_method_names = ["post"]
+class RegistrationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    queryset = CustomUser.objects.all()
+    serializer_class = RegistrationSerializer
+    http_method_names = ["post"]
 
-#     def get_serializer_class(self):
-#         email = self.request.data.get("email", "")
-#         if email.endswith("@my.csun.edu"):
-#             return StudentProfileSerializer
-#         elif email.endswith("@csun.edu"):
-#             return ProfessorProfileSerializer
-#         raise ValidationError("Invalid email domain")
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        # * Serialize Username, Password, Student_ID. Create Custom User and Prof/student profile
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user_instance = serializer.save()
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # * Generate an email confirmation token
+        user_id = str(user_instance.id)
+        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        payload = {"user_id": user_id, "exp": expiration_time}
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+        # TODO: Send email with link to email verification endpoint with token in URI
+        send_mail(
+            "Please Verify Your Email",
+            "Please confirm your email address by following the link \n"
+            + f"http://localhost:8000/emailverification/{token}",
+            "noreply@seniordesignproject.com",
+            [f"{user_instance.email}"],
+            fail_silently=False,
+        )
+        return Response(
+            {"user_data": serializer.data, "token": token},
+            status=status.HTTP_201_CREATED,
+        )
 
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # email = validated_data.get("email")
+        # password = validated_data.get("password")
+        # if email.endswith("@my.csun.edu"):
+        #     student_id = validated_data.get("student_id")
+
+        # if email and not email.endswith("@my.csun.edu"):
+        #     raise viewsets.ValidationError(
+        #         "This user is not a student or is not using a student email"
+        #     )
+
+        # try:
+        #     user = CustomUser.objects.create_user(
+        #         email=email,
+        #         password=password,
+        #     )
+
+        #     if user.email.endswith("@my.csun.edu"):
+        #         student_profile = StudentProfile.objects.create(
+        #             user=user, student_id=student_id
+        #         )
+        # except (ValidationError, IntegrityError) as e:
+        #     raise viewsets.ValidationError(str(e))
+
+        # return student_profile
+
+    # def get_serializer_class(self):
+    #     email = self.request.data.get("email", "")
+    #     if email.endswith("@my.csun.edu"):
+    #         return StudentProfileSerializer
+    #     elif email.endswith("@csun.edu"):
+    #         return ProfessorProfileSerializer
+    #     raise ValidationError("Invalid email domain")
+
+    # def register(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmailVerificationViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    http_method_names = ["get"]
+
+    @transaction.atomic
+    def verify(self, request, *args, **kwargs):
+        token = kwargs.get("token", None)
+
+        if token:
+            try:
+                payload = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+                user_id = payload["user_id"]
+                user_instance = get_object_or_404(CustomUser, pk=user_id)
+                user_instance.email_confirmed = True
+                user_instance.is_active = True
+                user_instance.save()
+                return Response(
+                    "Email verified successfully. User may login.",
+                    status=status.HTTP_200_OK,
+                )
+            except (jwt.ExpiredSignatureError, jwt.DecodeError):
+                return Response(
+                    "Verification link is invalid or expired",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                "No verification token provided.", status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
