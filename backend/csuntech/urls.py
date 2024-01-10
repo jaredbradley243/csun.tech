@@ -12,7 +12,8 @@ from accounts.views import (
     ProfessorDashboardViewSet,
     ProfessorProfileViewSet,
     UserProfileViewSet,
-    #     # RegisterViewSet,
+    RegistrationViewSet,
+    EmailVerificationViewSet,
 )
 from projects.views import ProjectsViewSet
 
@@ -22,11 +23,19 @@ router.register(r"users", CustomUserViewSet)
 router.register(r"students", StudentProfileViewSet)
 router.register(r"professorprofiles", ProfessorProfileViewSet)
 router.register(r"projects", ProjectsViewSet)
-# router.register(r"register", RegisterViewSet, basename="register")
 
 urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
+    path("register/", RegistrationViewSet.as_view({"post": "create"})),
+    path(
+        "emailverification/",
+        EmailVerificationViewSet.as_view({"get": "verify"}),
+    ),
+    path(
+        "emailverification/<str:token>/",
+        EmailVerificationViewSet.as_view({"get": "verify"}),
+    ),
     path(
         "projects/students/<str:user_id>/",
         ProjectsViewSet.as_view({"delete": "leave_project"}),
