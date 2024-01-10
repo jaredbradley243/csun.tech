@@ -36,7 +36,7 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
 
         if not email.endswith(("@csun.edu", "@my.csun.edu")):
-            raise ValidationError("Please Enter A CSUN email address")
+            raise ValidationError("User must us a CSUN email address")
 
         """" Get Name From Email """
         full_name = email.split("@")[0]
@@ -101,7 +101,7 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=30, blank=True, verbose_name="last name")
     is_staff = models.BooleanField(default=False, verbose_name="staff")
     email_confirmed = models.BooleanField(default=False, verbose_name="email confirmed")
-    is_active = models.BooleanField(default=True, verbose_name="active")
+    is_active = models.BooleanField(default=False, verbose_name="active")
 
     objects = CustomUserManager()
 
