@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
-
 import dotenv
 from pathlib import Path
 from datetime import timedelta
@@ -117,14 +116,12 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 # Email settings
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 EMAIL_HOST = "smtp.ionos.com"  # SMTP server
 EMAIL_PORT = 587  # SMTP port (commonly 587 for TLS)
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-print("This is emaial: ", EMAIL_HOST_USER)
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-print("This is password: ", EMAIL_HOST_PASSWORD)
+
 # Media files
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
