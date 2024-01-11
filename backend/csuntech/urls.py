@@ -14,6 +14,7 @@ from accounts.views import (
     UserProfileViewSet,
     RegistrationViewSet,
     EmailVerificationViewSet,
+    LoginViewSet,
 )
 from projects.views import ProjectsViewSet
 
@@ -28,6 +29,7 @@ urlpatterns = [
     path("", include(router.urls)),
     path("admin/", admin.site.urls),
     path("register/", RegistrationViewSet.as_view({"post": "create"})),
+    path("login/", LoginViewSet.as_view()),
     path(
         "emailverification/",
         EmailVerificationViewSet.as_view({"get": "verify"}),
