@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from django.db import IntegrityError, transaction
 from .models import CustomUser, StudentProfile, ProfessorProfile, CustomUserManager
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -39,6 +40,21 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
+class LoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        custom_user_instance = self.user
+        data.update(
+            {
+                "id": custom_user_instance.id,
+                "first_name": custom_user_instance.first_name,
+                "last_name": custom_user_instance.last_name,
+                "email": custom_user_instance.email,
+            }
+        )
+        return data
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -60,7 +76,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         # }
 
 
-# #! Student profile always created with team lead false, even if specified otherwise
 class StudentProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True, help_text="Required")
     password = serializers.CharField(write_only=True, help_text="Required")
@@ -122,45 +137,6 @@ class ProfessorDashboardStudentSerializer(serializers.ModelSerializer):
             "user",
             "project",
         ]
-
-
-# class UserProfileStudentSerializer(serializers.ModelSerializer):
-#     team_lead = serializers.BooleanField(
-#         source="studentprofile.team_lead", read_only=True
-#     )
-#     volunteer = serializers.BooleanField(
-#         source="studentprofile.is_volunteer", read_only=True
-#     )
-#     student_id = serializers.CharField(
-#         source="studentprofile.student_id", read_only=True
-#     )
-#     resume = serializers.FileField(source="studentprofile.resume")
-#     project = serializers.CharField(source="studentprofile.project", read_only=True)
-
-#     class Meta:
-#         model = CustomUser
-#         fields = [
-#             "id",
-#             "first_name",
-#             "last_name",
-#             "email",
-#             "student_id",
-#             "resume",
-#             "team_lead",
-#             "volunteer",
-#             "project",
-#         ]
-#         extra_kwargs = {
-#             "id": {"read_only": True},
-#             "first_name": {"read_only": True},
-#             "last_name": {"read_only": True},
-#             "email": {"read_only": True},
-#             # team_lead: readonly specified in serializer
-#             # volunteer: readonly specified in serializer
-#             # student_id: readonly specified in serializer
-#             # Resume can be updated
-#             # project: readonly specified in serializer
-#         }
 
 
 class UserProfileStudentSerializer(serializers.ModelSerializer):
