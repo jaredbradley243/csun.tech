@@ -29,6 +29,7 @@ from .serializers import (
     UserProfileStudentSerializer,
     UserProfileProfessorSerializer,
     RegistrationSerializer,
+    LoginSerializer,
 )
 
 from projects.serializers import (
@@ -39,13 +40,12 @@ from projects.serializers import (
 from django.shortcuts import get_object_or_404
 from django.db import transaction, IntegrityError
 from csuntech.settings import SECRET_KEY
+from django.template.loader import render_to_string
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-# TODO - Protect endpoints from non-authenticated and non-authorized users
-# Todo - For example, only authenticated users, and specifically students can join projects
-
-
-# # TODO - Finish the registration endpoint
+# TODO - Handle token expiration
+# TODO - Handle resend verification email
 class RegistrationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = CustomUser.objects.all()
     serializer_class = RegistrationSerializer
@@ -64,59 +64,24 @@ class RegistrationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
         expiration_time = datetime.datetime.utcnow() + datetime.timedelta(days=1)
         payload = {"user_id": user_id, "exp": expiration_time}
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-        # TODO: Send email with link to email verification endpoint with token in URI
+        # * Send email with link to email verification endpoint with token in URI
         send_mail(
             "Please Verify Your Email",
             "Please confirm your email address by following the link \n"
             + f"http://localhost:8000/emailverification/{token}",
-            "noreply@seniordesignproject.com",
+            "CSUN Senior Design <noreply@seniordesignproject.com>",
             [f"{user_instance.email}"],
+            html_message=render_to_string(
+                "accounts/verification.html", {"token": token}
+            ),
             fail_silently=False,
         )
-        return Response(
-            {"user_data": serializer.data, "token": token},
-            status=status.HTTP_201_CREATED,
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        # email = validated_data.get("email")
-        # password = validated_data.get("password")
-        # if email.endswith("@my.csun.edu"):
-        #     student_id = validated_data.get("student_id")
 
-        # if email and not email.endswith("@my.csun.edu"):
-        #     raise viewsets.ValidationError(
-        #         "This user is not a student or is not using a student email"
-        #     )
-
-        # try:
-        #     user = CustomUser.objects.create_user(
-        #         email=email,
-        #         password=password,
-        #     )
-
-        #     if user.email.endswith("@my.csun.edu"):
-        #         student_profile = StudentProfile.objects.create(
-        #             user=user, student_id=student_id
-        #         )
-        # except (ValidationError, IntegrityError) as e:
-        #     raise viewsets.ValidationError(str(e))
-
-        # return student_profile
-
-    # def get_serializer_class(self):
-    #     email = self.request.data.get("email", "")
-    #     if email.endswith("@my.csun.edu"):
-    #         return StudentProfileSerializer
-    #     elif email.endswith("@csun.edu"):
-    #         return ProfessorProfileSerializer
-    #     raise ValidationError("Invalid email domain")
-
-    # def register(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class LoginViewSet(TokenObtainPairView):
+    serializer_class = LoginSerializer
+    http_method_names = ["post"]
 
 
 class EmailVerificationViewSet(viewsets.ModelViewSet):
