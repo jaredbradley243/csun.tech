@@ -22,7 +22,7 @@ from django.core.mail import send_mail
 
 from .serializers import (
     CustomUserSerializer,
-    StudentProfileSerializer,
+    # StudentProfileSerializer,
     ProfessorProfileSerializer,
     ProfessorDashboardStudentSerializer,
     ProfessorNameSerializer,
@@ -44,8 +44,6 @@ from django.template.loader import render_to_string
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-# TODO - Handle token expiration
-# TODO - Handle resend verification email
 class RegistrationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = CustomUser.objects.all()
     serializer_class = RegistrationSerializer
@@ -53,29 +51,33 @@ class RegistrationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        # * Serialize Username, Password, Student_ID. Create Custom User and Prof/student profile
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user_instance = serializer.save()
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # * Generate an email confirmation token
-        user_id = str(user_instance.id)
-        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        payload = {"user_id": user_id, "exp": expiration_time}
-        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-        # * Send email with link to email verification endpoint with token in URI
-        send_mail(
-            "Please Verify Your Email",
-            "Please confirm your email address by following the link \n"
-            + f"http://localhost:8000/emailverification/{token}",
-            "CSUN Senior Design <noreply@seniordesignproject.com>",
-            [f"{user_instance.email}"],
-            html_message=render_to_string(
-                "accounts/verification.html", {"token": token}
-            ),
-            fail_silently=False,
-        )
+        try:
+            # * Serialize Username, Password, Student_ID.
+            # * Create Custom User and Prof/student profile
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                user_instance = serializer.save()
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # * Generate an email confirmation token
+            user_id = str(user_instance.id)
+            expiration_time = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            payload = {"user_id": user_id, "exp": expiration_time}
+            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            # * Send email with link to email verification endpoint with token in URI
+            send_mail(
+                "Please Verify Your Email",
+                "Please confirm your email address by following the link \n"
+                + f"http://localhost:8000/emailverification/{token}",
+                "CSUN Senior Design <noreply@seniordesignproject.com>",
+                [f"{user_instance.email}"],
+                html_message=render_to_string(
+                    "accounts/email_verification.html", {"token": token}
+                ),
+                fail_silently=False,
+            )
+        except Exception as error:
+            return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -87,9 +89,9 @@ class LoginViewSet(TokenObtainPairView):
 class EmailVerificationViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    http_method_names = ["get"]
 
     @transaction.atomic
+    @action(detail=False, methods=["get"])
     def verify(self, request, *args, **kwargs):
         token = kwargs.get("token", None)
 
@@ -105,15 +107,104 @@ class EmailVerificationViewSet(viewsets.ModelViewSet):
                     "Email verified successfully. User may login.",
                     status=status.HTTP_200_OK,
                 )
-            except (jwt.ExpiredSignatureError, jwt.DecodeError):
+            except jwt.ExpiredSignatureError:
                 return Response(
-                    "Verification link is invalid or expired",
-                    status=status.HTTP_400_BAD_REQUEST,
+                    "TokenExpiredError",
+                    status=status.HTTP_401_UNAUTHORIZED,
                 )
+            except jwt.DecodeError as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(
                 "No verification token provided.", status=status.HTTP_400_BAD_REQUEST
             )
+
+    @action(detail=False, methods=["get"])
+    def resend(self, request, *args, **kwargs):
+        try:
+            user_instance = self.get_object()
+            # * Generate an email confirmation token
+            user_id = str(user_instance.id)
+            expiration_time = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            payload = {"user_id": user_id, "exp": expiration_time}
+            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            # * Send email with link to email verification endpoint with token in URI
+            send_mail(
+                "Please Verify Your Email",
+                "Please confirm your email address by following the link \n"
+                + f"http://localhost:8000/emailverification/{token}",
+                "CSUN Senior Design <noreply@seniordesignproject.com>",
+                [f"{user_instance.email}"],
+                html_message=render_to_string(
+                    "accounts/email_verification.html", {"token": token}
+                ),
+                fail_silently=False,
+            )
+        except:
+            return Response(
+                "Email send unsuccessful", status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response("Email sent successfully", status=status.HTTP_200_OK)
+
+
+class PasswordRestViewSet(viewsets.GenericViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+    @action(detail=False, methods=["post"])
+    def send_reset_email(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        if not email:
+            return Response("No email was given")
+        try:
+            user_instance = CustomUser.objects.get(email=email)
+            user_id = str(user_instance.id)
+            expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            payload = {"user_id": user_id, "exp": expiration_time}
+            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+            send_mail(
+                "CSUN Senior Design Password Reset",
+                None,
+                "CSUN Senior Design <noreply@seniordesignproject.com>",
+                [f"{user_instance.email}"],
+                html_message=render_to_string(
+                    "accounts/password_reset.html", {"token": token}
+                ),
+                fail_silently=False,
+            )
+        except ObjectDoesNotExist:
+            return Response(
+                "If an account with this email exists, a password reset email has been sent.",
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            "If an account with this email exists, a password reset email has been sent.",
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"])
+    @transaction.atomic
+    def update_password(self, request, *args, **kwargs):
+        token = kwargs.get("token", None)
+        new_password = request.data.get("new_password")
+        if not new_password:
+            return Response("New password must be given")
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+        except jwt.ExpiredSignatureError:
+            return Response(
+                "TokenExpiredError",
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        except jwt.DecodeError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        user_id = payload["user_id"]
+        user_instance = get_object_or_404(CustomUser, pk=user_id)
+        user_instance.set_password(new_password)
+        user_instance.save()
+
+        return Response("password has been changed", status=status.HTTP_202_ACCEPTED)
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -121,6 +212,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     http_method_names = ["get", "put", "patch", "delete", "head", "options", "trace"]
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         if "first_name" in request.data or "last_name" in request.data:
             return Response(
@@ -140,85 +232,86 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class StudentProfileViewSet(viewsets.ModelViewSet):
-    queryset = StudentProfile.objects.all()
-    serializer_class = StudentProfileSerializer
+# # TODO: Delete StudentProfileViewset
+# class StudentProfileViewSet(viewsets.ModelViewSet):
+#     queryset = StudentProfile.objects.all()
+#     serializer_class = StudentProfileSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
+#     def update(self, request, *args, **kwargs):
+#         instance = self.get_object()
 
-        request_data_id = request.data.get("id", None)
-        request_data_user = request.data.get("user", None)
-        if request_data_id and request_data_id != str(instance.id):
-            return Response(
-                "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
-            )
-        if request_data_user and request_data_user != str(instance.user.id):
-            return Response(
-                "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
-            )
+#         request_data_id = request.data.get("id", None)
+#         request_data_user = request.data.get("user", None)
+#         if request_data_id and request_data_id != str(instance.id):
+#             return Response(
+#                 "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if request_data_user and request_data_user != str(instance.user.id):
+#             return Response(
+#                 "User IDs cannot be changed", status=status.HTTP_400_BAD_REQUEST
+#             )
 
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+#         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["post"])
-    def join_project(self, request, pk=None):
-        try:
-            student_profile = self.get_object()
-        except Http404:
-            return Response(
-                "Student profile not found", status=status.HTTP_404_NOT_FOUND
-            )
-        project_id = request.data.get("project")
-        if project_id is None:
-            return Response("Missing project_id", status=status.HTTP_400_BAD_REQUEST)
-        try:
-            project_id = int(project_id)
-            if project_id <= 0:
-                raise ValueError()
-        except ValueError:
-            return Response("Invalid project_id", status=status.HTTP_400_BAD_REQUEST)
-        try:
-            project = Project.objects.get(pk=project_id)
-        except ObjectDoesNotExist:
-            return Response("Project does not exist", status=status.HTTP_404_NOT_FOUND)
-        try:
-            student_profile.join_project(project)
-        except ValidationError as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+#     @action(detail=True, methods=["post"])
+#     def join_project(self, request, pk=None):
+#         try:
+#             student_profile = self.get_object()
+#         except Http404:
+#             return Response(
+#                 "Student profile not found", status=status.HTTP_404_NOT_FOUND
+#             )
+#         project_id = request.data.get("project")
+#         if project_id is None:
+#             return Response("Missing project_id", status=status.HTTP_400_BAD_REQUEST)
+#         try:
+#             project_id = int(project_id)
+#             if project_id <= 0:
+#                 raise ValueError()
+#         except ValueError:
+#             return Response("Invalid project_id", status=status.HTTP_400_BAD_REQUEST)
+#         try:
+#             project = Project.objects.get(pk=project_id)
+#         except ObjectDoesNotExist:
+#             return Response("Project does not exist", status=status.HTTP_404_NOT_FOUND)
+#         try:
+#             student_profile.join_project(project)
+#         except ValidationError as e:
+#             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = StudentProfileSerializer(student_profile)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+#         serializer = StudentProfileSerializer(student_profile)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["post"])
-    def leave_project(self, request, pk=None):
-        try:
-            student_profile = self.get_object()
-        except Http404:
-            return Response(
-                "Student profile not found", status=status.HTTP_404_NOT_FOUND
-            )
-        try:
-            student_profile.leave_project()
-        except ValidationError as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+#     @action(detail=True, methods=["post"])
+#     def leave_project(self, request, pk=None):
+#         try:
+#             student_profile = self.get_object()
+#         except Http404:
+#             return Response(
+#                 "Student profile not found", status=status.HTTP_404_NOT_FOUND
+#             )
+#         try:
+#             student_profile.leave_project()
+#         except ValidationError as e:
+#             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = StudentProfileSerializer(student_profile)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+#         serializer = StudentProfileSerializer(student_profile)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ProfessorProfileViewSet(viewsets.ModelViewSet):
@@ -246,8 +339,9 @@ class ProfessorDashboardViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewS
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
-
-        professor_instance = self.get_object()
+        user_id = kwargs.get("pk", None)
+        user_instance = CustomUser.objects.get(id=user_id)
+        professor_instance = user_instance.professorprofile
         projects = professor_instance.projects.all()
         students = StudentProfile.objects.filter(project__in=projects).distinct()
 
@@ -275,7 +369,9 @@ class ProfessorDashboardViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewS
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        professor_instance = self.get_object()
+        user_id = kwargs.get("pk", None)
+        user_instance = CustomUser.objects.get(id=user_id)
+        professor_instance = user_instance.professorprofile
         projects = professor_instance.projects.all()
         students = StudentProfile.objects.filter(project__in=projects).distinct()
 
@@ -301,7 +397,9 @@ class ProfessorDashboardViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewS
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        professor_instance = self.get_object()
+        user_id = kwargs.get("pk", None)
+        user_instance = CustomUser.objects.get(id=user_id)
+        professor_instance = user_instance.professorprofile
         projects = professor_instance.projects.all()
 
         project_serializer = ProfessorDashboardProjectSerializer(projects, many=True)
@@ -350,6 +448,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         if request.user.is_anonymous:
             return Response(
@@ -375,6 +474,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                     "error": "Unauthorized action. You cannot update another user's profile."
                 },
                 status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if "id" in request.data:
+            return Response(
+                {"ID can not be altered"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if "first_name" in request.data or "last_name" in request.data:
