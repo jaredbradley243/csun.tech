@@ -150,7 +150,6 @@ class CustomUser(AbstractUser):
 class StudentProfile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-
     team_lead = models.BooleanField(default=False, blank=True)
     is_volunteer = models.BooleanField(default=False, verbose_name="volunteer")
     student_id = models.CharField(
@@ -225,25 +224,33 @@ class ProfessorProfile(models.Model):
         project_name,
         open_slots,
         capacity,
-        # meeting_schedule=None,
+        meeting_schedule=None,
         project_description=None,
         relevant_skills=None,
     ):
-        if not self.is_professor:
-            raise PermissionDenied("Only professors can create projects")
         project = Project.objects.create(
             project_name=project_name,
             project_description=project_description,
             open_slots=open_slots,
             capacity=capacity,
             relevant_skills=relevant_skills,
-            # meeting_schedule=meeting_schedule,
+            meeting_schedule=meeting_schedule,
         )
         self.projects.add(project)
+        return project
 
-    # TODO: Modify Function to error check
+    # # TODO: Modify Function to error check
+    def join_project(self, project):
+        if not project:
+            raise ValidationError("Project to join must be specified")
+        project.add_professor(self)
+
     def leave_project(self, project):
-        self.projects.remove(project)
+        if not self.projects:
+            raise ValidationError("Professor is not sponsoring a project")
+        if not project:
+            raise ValidationError("Project to join must be specified")
+        project.remove_professor(self)
 
     # TODO: Modify Function to error check
     def edit_project(self, project, **kwargs):
@@ -256,6 +263,7 @@ class ProfessorProfile(models.Model):
             project.save()
         else:
             raise ValidationError("Professor is not associated with this project")
+        return project
 
     def delete_project(self, project):
         if project in self.projects.all():
