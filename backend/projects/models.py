@@ -56,6 +56,12 @@ class Project(models.Model):
         self.open_slots += 1
         self.save()
 
+    def add_professor(self, professor):
+        professor.projects.add(self)
+
+    def remove_professor(self, professor):
+        professor.projects.remove(self)
+
     def save(self, *args, **kwargs):
         self.validate_open_slots()
         super().save(*args, **kwargs)
