@@ -5,6 +5,7 @@ from accounts.serializers import (
     ProfessorNameSerializer,
 )
 
+from django.core.exceptions import ValidationError
 from datetime import datetime
 
 
@@ -96,14 +97,19 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        project = Project.objects.create(**validated_data)
+        user_instance = validated_data.pop("user_instance")
+        project = user_instance.professorprofile.create_project(**validated_data)
         return project
 
     def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
+        user_instance = validated_data.pop("user_instance")
+        try:
+            project = user_instance.professorprofile.edit_project(
+                project=instance, **validated_data
+            )
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return project
 
 
 # # * Used for Professor Dashboard
