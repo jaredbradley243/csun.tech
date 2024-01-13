@@ -8,22 +8,29 @@ from rest_framework_simplejwt.views import (
 )
 from accounts.views import (
     CustomUserViewSet,
-    StudentProfileViewSet,
+    # StudentProfileViewSet,
     ProfessorDashboardViewSet,
     ProfessorProfileViewSet,
     UserProfileViewSet,
     RegistrationViewSet,
     EmailVerificationViewSet,
     LoginViewSet,
+    PasswordRestViewSet,
 )
 from projects.views import ProjectsViewSet
 
 router = DefaultRouter()
-router.register(r"users", CustomUserViewSet)
-# router.register(r"userprofile", UserProfileViewSet, basename="userprofile")
-router.register(r"students", StudentProfileViewSet)
-router.register(r"professorprofiles", ProfessorProfileViewSet)
 router.register(r"projects", ProjectsViewSet)
+
+# TODO: Delete users router
+router.register(r"users", CustomUserViewSet)
+
+# TODO: Delete students router
+# router.register(r"students", StudentProfileViewSet)
+
+# TODO: Delete professorprofiles router
+# router.register(r"professorprofiles", ProfessorProfileViewSet)
+
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -39,8 +46,24 @@ urlpatterns = [
         EmailVerificationViewSet.as_view({"get": "verify"}),
     ),
     path(
+        "resendverificationemail/<uuid:pk>/",
+        EmailVerificationViewSet.as_view({"get": "resend"}),
+    ),
+    path(
+        "passwordreset/",
+        PasswordRestViewSet.as_view({"post": "send_reset_email"}),
+    ),
+    path(
+        "passwordreset/<str:token>/",
+        PasswordRestViewSet.as_view({"post": "update_password"}),
+    ),
+    path(
         "projects/students/<str:user_id>/",
         ProjectsViewSet.as_view({"delete": "leave_project"}),
+    ),
+    path(
+        "projects/<int:pk>/professors/<str:user_id>/",
+        ProjectsViewSet.as_view({"delete": "professor_leave_project"}),
     ),
     path(
         "professors/<uuid:pk>/dashboard/",
@@ -62,10 +85,3 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
-
-# TODO - Create email verification endpoint to send users when
-# they click link in verification email
-
-# TODO - Create login endpoint for users to login
-# 1) Check for email_confirmed value of True
-# 2) Check for JWT token
