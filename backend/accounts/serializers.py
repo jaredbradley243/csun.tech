@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.db import IntegrityError, transaction
 from .models import CustomUser, StudentProfile, ProfessorProfile, CustomUserManager
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.models import update_last_login
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -41,74 +42,101 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
+    @transaction.atomic
     def validate(self, attrs):
         data = super().validate(attrs)
-        custom_user_instance = self.user
+        user_instance = self.user
         data.update(
             {
-                "id": custom_user_instance.id,
-                "first_name": custom_user_instance.first_name,
-                "last_name": custom_user_instance.last_name,
-                "email": custom_user_instance.email,
+                "id": user_instance.id,
+                "first_name": user_instance.first_name,
+                "last_name": user_instance.last_name,
+                "email": user_instance.email,
             }
         )
+        update_last_login(None, user_instance)
         return data
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = "__all__"
+        # fields = "__all__"
         # TODO: Remove fields above and uncomment fields/extra kw below
-        # fields = [
-        #     "id",
-        #     "password",
-        #     "email",
-        #     "first_name",
-        #     "last_name",
-        #     "email_confirmed",
-        # ]
-        # extra_kwargs = {
-        #     "password": {"write_only": True},
-        #     "first_name": {"read_only": True},
-        #     "last_name": {"read_only": True},
-        #     "email_confirmed": {"write_only": True},
-        # }
-
-
-class StudentProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(write_only=True, help_text="Required")
-    password = serializers.CharField(write_only=True, help_text="Required")
-    first_name = serializers.CharField(source="user.first_name", read_only=True)
-    last_name = serializers.CharField(source="user.last_name", read_only=True)
-
-    class Meta:
-        model = StudentProfile
-        fields = "__all__"
+        fields = [
+            "id",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+            "email_confirmed",
+        ]
         extra_kwargs = {
-            "student_id": {"help_text": "Required"},
-            "user": {"read_only": True},
+            "password": {"write_only": True},
+            "first_name": {"read_only": True},
+            "last_name": {"read_only": True},
+            "email_confirmed": {"write_only": True},
         }
 
 
+# TODO: Delete StudentProfileSerializer
+# class StudentProfileSerializer(serializers.ModelSerializer):
+#     email = serializers.EmailField(write_only=True, help_text="Required")
+#     password = serializers.CharField(write_only=True, help_text="Required")
+#     first_name = serializers.CharField(source="user.first_name", read_only=True)
+#     last_name = serializers.CharField(source="user.last_name", read_only=True)
+#     # id = serializers.UUIDField(source="user.id")
+
+#     class Meta:
+#         model = StudentProfile
+#         fields = "__all__"
+#         # fields = [
+#         #     "id",
+#         #     "first_name",
+#         #     "last_name",
+#         #     "email",
+#         #     "password",
+#         #     "team_lead",
+#         #     "is_volunteer",
+#         #     "student_id",
+#         #     "resume",
+#         #     "project",
+#         # ]
+#         extra_kwargs = {
+#             "student_id": {"help_text": "Required"},
+#             "id": {"read_only": True},
+#         }
+
+
+# TODO: Remove "user" field. IE. Don't use "all"
 # * This serializer is nested in the ProjectDetailSerializer in /projects/serializers.py
 # * to show detailed professor information in the project detail
 class ProfessorProfileSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source="user.id", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
 
     class Meta:
         model = ProfessorProfile
-        fields = "__all__"
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "csun_faculty_page_link",
+            "bio",
+            "projects",
+        ]
         extra_kwargs = {
-            "user": {"read_only": True},
+            "id": {"read_only": True},
         }
 
 
 # * This serializer is nested in the ProjectListSerializer in /projects/serializers.py
 # * to show basic professor information in the project list and dashboard
 class ProfessorNameSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source="user.id", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
 
@@ -119,6 +147,7 @@ class ProfessorNameSerializer(serializers.ModelSerializer):
 
 # * Used for Professor Dashboard
 class ProfessorDashboardStudentSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source="user.id", read_only=True)
     first_name = serializers.CharField(source="user.first_name")
     last_name = serializers.CharField(source="user.last_name")
     email = serializers.EmailField(source="user.email")
@@ -134,13 +163,12 @@ class ProfessorDashboardStudentSerializer(serializers.ModelSerializer):
             "is_volunteer",
             "student_id",
             "resume",
-            "user",
             "project",
         ]
 
 
 class UserProfileStudentSerializer(serializers.ModelSerializer):
-    user_id = serializers.UUIDField(source="user.id", read_only=True)
+    id = serializers.UUIDField(source="user.id", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
@@ -149,7 +177,6 @@ class UserProfileStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = [
-            "user_id",
             "id",
             "first_name",
             "last_name",
@@ -180,11 +207,11 @@ class UserProfileStudentSerializer(serializers.ModelSerializer):
         )
         student_profile.resume = validated_data.get("resume", student_profile.resume)
         student_profile.save()
-        return super().update(instance, validated_data)
+        return student_profile
 
 
 class UserProfileProfessorSerializer(serializers.ModelSerializer):
-    user_id = serializers.UUIDField(source="user.id", read_only=True)
+    id = serializers.UUIDField(source="user.id", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
@@ -193,7 +220,6 @@ class UserProfileProfessorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessorProfile
         fields = [
-            "user_id",
             "id",
             "first_name",
             "last_name",
@@ -217,4 +243,4 @@ class UserProfileProfessorSerializer(serializers.ModelSerializer):
         professor_profile = instance.professorprofile
         professor_profile.bio = validated_data.get("bio", professor_profile.bio)
         professor_profile.save()
-        return super().update(instance, validated_data)
+        return professor_profile
